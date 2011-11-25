@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>Ambiguous ampersand checker for HTML</title>
+<meta name=viewport content="width=device-width">
+<link rel=stylesheet href=eff.css>
+<meta name=description content="An on-the-fly ambiguous ampersand checker for HTML.">
+<h1>Ambiguous ampersand checker for HTML</h1>
+<noscript><strong>To use this tool, please <a href=//enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
+<p><textarea autofocus>foo &amp;lolwat; bar &amp;123; baz</textarea>
+<div id=output class=fail><p><a href=#foo%20%26lolwat%3B%20bar%20%26123%3B%20baz>#</a> Found 2 ambiguous ampersands:<ul><li><code>&amp;lolwat;</code><li><code>&amp;123;</code></ul><p>Found no character references that don’t end with a semicolon.</div>
+<p>See <a href=//mathiasbynens.be/notes/ambiguous-ampersands>“Ambiguous ampersands in HTML”</a>:
+<blockquote cite=//mathiasbynens.be/notes/ambiguous-ampersands><p>To summarize: there’s a difference between unencoded ampersands (sometimes valid), ambiguous ampersands (always invalid) and encoded ampersands (always valid). An unencoded ampersand is not always an ambiguous ampersand. An unambiguous ampersand can still be invalid.</blockquote>
+<p>For more information, <a href=//mathiasbynens.be/notes/ambiguous-ampersands title="Ambiguous ampersands in HTML">read the whole thing</a>.
+<p>Note that this tool treats all ampersands as if they were used as text, i.e. outside of an attribute value and outside of <code>&lt;script></code> or <code>&lt;style></code> elements. Browsers parse ampersands differently when they’re part of an attribute value. For example, the ampersand in <code>&lt;a href="&ampfoo;"></code> is an ambiguous ampersand, rather than a parsed entity without a semicolon (which is what this tool would report). The ampersand in <code>&lt;script>"&ampfoo;"&lt;/script></code> is neither.
+<p id=footer>Made by <a href=//mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in>fork this on GitHub!</a></p>
+<script src=eff.js></script>
