@@ -33,9 +33,9 @@
 			/;$/.test(html) || noSemi.push(html);
 		});
 		// sort by length in descending order, for the lulz
-		copy('/&(?:' + noSemi.sort(function(a, b) { a = a.length; b = b.length; return a > b ? -1 : a < b ? 1 : 0; }).join('|') + ')/g');
+		copy('/&(?:' + noSemi.sort(function(a, b) { a = a.length; b = b.length; return a > b ? -1 : a < b ? 1 : 0; }).join('|') + ')[^;]?/g');
 	*/
-	regexNoSemi = /(&(?:iacute|Aacute|Uacute|plusmn|otilde|Otilde|Agrave|agrave|yacute|Yacute|oslash|Oslash|Atilde|atilde|brvbar|Ccedil|ccedil|ograve|curren|divide|Eacute|eacute|Ograve|oacute|Egrave|egrave|ugrave|frac12|frac14|frac34|Ugrave|Oacute|Iacute|ntilde|Ntilde|uacute|middot|Igrave|igrave|iquest|aacute|cedil|laquo|micro|iexcl|icirc|Icirc|Acirc|ucirc|ecirc|Ocirc|ocirc|Ecirc|Ucirc|aring|Aring|aelig|AElig|acute|pound|raquo|acirc|times|thorn|szlig|THORN|copy|Auml|ordf|ordm|uuml|macr|Uuml|auml|Ouml|ouml|para|nbsp|Euml|QUOT|quot|euml|yuml|cent|sect|COPY|sup1|sup2|sup3|Iuml|iuml|eth|shy|REG|not|yen|AMP|amp|reg|uml|ETH|deg|GT|gt|lt|LT))[^;]/g;
+	regexNoSemi = /(&(?:iacute|Aacute|Uacute|plusmn|otilde|Otilde|Agrave|agrave|yacute|Yacute|oslash|Oslash|Atilde|atilde|brvbar|Ccedil|ccedil|ograve|curren|divide|Eacute|eacute|Ograve|oacute|Egrave|egrave|ugrave|frac12|frac14|frac34|Ugrave|Oacute|Iacute|ntilde|Ntilde|uacute|middot|Igrave|igrave|iquest|aacute|cedil|laquo|micro|iexcl|icirc|Icirc|Acirc|ucirc|ecirc|Ocirc|ocirc|Ecirc|Ucirc|aring|Aring|aelig|AElig|acute|pound|raquo|acirc|times|thorn|szlig|THORN|copy|Auml|ordf|ordm|uuml|macr|Uuml|auml|Ouml|ouml|para|nbsp|Euml|QUOT|quot|euml|yuml|cent|sect|COPY|sup1|sup2|sup3|Iuml|iuml|eth|shy|REG|not|yen|AMP|amp|reg|uml|ETH|deg|GT|gt|lt|LT))[^;]?/g;
 
 	/*
 		// Go to http://www.whatwg.org/specs/web-apps/current-work/multipage/named-character-references.html and run this in your console:
@@ -2222,7 +2222,7 @@
 			semiless.push($1);
 			return ''; // remove the ones we already handled
 		}).replace(regexCharacterReference, function($0, $1) {
-			characterReferences[$1] || ambiguousAmpersands.push($0);
+			characterReferences.hasOwnProperty($1) || ambiguousAmpersands.push($0);
 		});
 		ambiguousAmpersandCount = ambiguousAmpersands.length;
 		semilessCount = semiless.length;
