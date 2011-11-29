@@ -37,13 +37,13 @@
 	}
 
 	function update() {
-		var value = textarea.value,
+		var value = textarea.value.replace(/\r\n/g, '\n'),
 		    encodedValue = encodeURI(value),
 		    byteCount = ~-encodedValue.split(/%..|./).length, // https://gist.github.com/1010324
 		    characterCount = utf16decode(value).length;
 		characters.innerHTML = formatNumber(characterCount, 'character');
 		bytes.innerHTML = formatNumber(byteCount, 'byte');
-		permalink.href = '#' + encodedValue;
+		permalink.hash = encodedValue;
 		storage && (storage.byteCountText = value);
 	};
 
