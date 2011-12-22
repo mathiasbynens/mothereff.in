@@ -8,10 +8,13 @@
 	    regexCharacterReference = /&([0-9a-zA-Z]+);/g,
 	    regexCharacterReferencesThatHaveASemicolonFreeCharacterReferenceAsSubstring,
 	    regexNoSemi,
+	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	try {
-	    		var storage = window.localStorage;
-	    		return storage.getItem && storage;
+	    		var storage = window.localStorage,
+	    		    uid = new Date;
+	    		storage.setItem(uid, uid);
+	    		return storage.getItem(uid) == uid && storage;
 	    	} catch(e) {}
 	    }()),
 	    characterReferences;

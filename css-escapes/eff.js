@@ -16,10 +16,13 @@
 	    	'\u2028': '\\u2028',
 	    	'\u2029': '\\u2029'
 	    },
+	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	try {
-	    		var storage = window.localStorage;
-	    		return storage.getItem && storage;
+	    		var storage = window.localStorage,
+	    		    uid = new Date;
+	    		storage.setItem(uid, uid);
+	    		return storage.getItem(uid) == uid && storage;
 	    	} catch(e) {}
 	    }());
 
