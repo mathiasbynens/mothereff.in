@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>JavaScript escapes</title>
+<meta name=viewport content="width=device-width">
+<link rel=stylesheet href=eff.css>
+<meta name=description content="An on-the-fly JavaScript character escaper for non-ASCII and unprintable ASCII characters.">
+<h1>JavaScript escapes</h1>
+<noscript><strong>To use this tool, please <a href=//enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
+<textarea autofocus>Fingerspitzengefühl is a German term.\nIt’s pronounced as follows: [ˈfɪŋɐˌʃpɪtsənɡəˌfyːl]</textarea>
+<label><input type=checkbox checked> only escape non-ASCII and unprintable ASCII characters</label>
+<p><a href=#1Fingerspitzengef%C3%BChl%20is%20a%20German%20term.%5CnIt%E2%80%99s%20pronounced%20as%20follows%3A%20%5B%CB%88f%C9%AA%C5%8B%C9%90%CB%8C%CA%83p%C9%AAts%C9%99n%C9%A1%C9%99%CB%8Cfy%CB%90l%5D id=permalink>permalink</a>
+<pre><code>'Fingerspitzengef\xfchl is a German term.\nIt\u2019s pronounced as follows: [\u02c8f\u026a\u014b\u0250\u02cc\u0283p\u026ats\u0259n\u0261\u0259\u02ccfy\u02d0l]'</code></pre>
+<p><a href=http://mathiasbynens.be/notes/javascript-escapes>Learn all about JavaScript character escapes</a> and do it manually, or just use this tool.
+<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/js-escapes>fork this on GitHub!</a></p>
+<script src=eff.js></script>
