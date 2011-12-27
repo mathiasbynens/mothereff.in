@@ -14,15 +14,19 @@
 	    		return storage.getItem(uid) == uid && storage;
 	    	} catch(e) {}
 	    }()),
-	    // http://es5.github.com/#x7.8.4
-	    // Table 4 — String Single Character Escape Sequences
 	    cache = {
+	    	// http://es5.github.com/#x7.8.4
+	    	// Table 4 — String Single Character Escape Sequences
 	    	'\b': '\\b',
 	    	'\t': '\\t',
 	    	'\n': '\\n',
 	    	'\v': '\\v',
 	    	'\f': '\\f',
 	    	'\r': '\\r',
+	    	// escape double quotes, \u2028, and \u2029 too, as they break input
+	    	'\"': '\\\"',
+	    	'\u2028': '\\u2028',
+	    	'\u2029': '\\u2029',
 	    	// we’re wrapping the string in single quotes, so escape those too
 	    	'\'': '\\\''
 	    };
@@ -57,7 +61,9 @@
 	function update() {
 		var value = textarea.value;
 		try {
-			text(code, '\'' + unicodeEscape((1,eval)('"' + value.replace(/\n/g, '\\n').replace(/\"/g, '\\\"').replace(/\'/g, '\\\'') + '"')) + '\'');
+			text(code, '\'' + unicodeEscape((1,eval)('"' + value.replace(/[\n\u2028\u2029"']/g, function(chr) {
+				return cache[chr];
+			}) + '"')) + '\'');
 			pre.className = '';
 		} catch (e) {
 			pre.className = 'fail';
