@@ -20,7 +20,7 @@
 	    	'\b': '\\b',
 	    	'\t': '\\t',
 	    	'\n': '\\n',
-	    	'\v': '\\v',
+	    	'\v': '\\x0b', // In IE < 9, '\v' == 'v'
 	    	'\f': '\\f',
 	    	'\r': '\\r',
 	    	// escape double quotes, \u2028, and \u2029 too, as they break input
@@ -61,9 +61,17 @@
 	function update() {
 		var value = textarea.value;
 		try {
-			text(code, '\'' + unicodeEscape((1,eval)('"' + value.replace(/[\n\u2028\u2029"']/g, function(chr) {
-				return cache[chr];
-			}) + '"')) + '\'');
+			text(
+				code,
+				'\'' + unicodeEscape((1,eval)(
+					'"'
+					+ value.replace(/[\n\u2028\u2029"']/g, function(chr) {
+						return cache[chr];
+					})
+					.replace(/\\v/g, '\x0b') // In IE < 9, '\v' == 'v'; this normalizes the input
+					+ '"'
+				)) + '\''
+			);
 			pre.className = '';
 		} catch (e) {
 			pre.className = 'fail';
