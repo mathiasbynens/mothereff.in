@@ -1,4 +1,4 @@
-(function(window, document) {
+(function(window, document, evil) {
 
 	var pre = document.getElementsByTagName('pre')[0],
 	    code = document.getElementsByTagName('code')[0],
@@ -63,7 +63,7 @@
 		try {
 			text(
 				code,
-				'\'' + unicodeEscape((1,eval)(
+				'\'' + unicodeEscape((1,evil)(
 					'"'
 					+ value.replace(/[\n\u2028\u2029"']/g, function(chr) {
 						return cache[chr];
@@ -111,7 +111,7 @@
 	}
 
 
-}(this, document));
+}(this, document, eval));
 
 // Google Analytics
 var _gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
