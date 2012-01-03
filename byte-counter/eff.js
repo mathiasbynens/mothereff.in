@@ -15,7 +15,7 @@
 	    }());
 
 	// Taken from http://mths.be/punycode
-	function utf16decode(string) {
+	function ucs2decode(string) {
 		var output = [],
 		    counter = 0,
 		    length = string.length,
@@ -26,7 +26,7 @@
 			if ((value & 0xF800) == 0xD800) {
 				extra = string.charCodeAt(counter++);
 				if ((value & 0xFC00) != 0xD800 || (extra & 0xFC00) != 0xDC00) {
-					throw Error('Illegal UTF-16 sequence');
+					throw Error('Illegal UCS-2 sequence');
 				}
 				value = ((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
 			}
@@ -43,7 +43,7 @@
 		var value = textarea.value.replace(/\r\n/g, '\n'),
 		    encodedValue = encodeURI(value),
 		    byteCount = ~-encodedValue.split(/%..|./).length, // https://gist.github.com/1010324
-		    characterCount = utf16decode(value).length;
+		    characterCount = ucs2decode(value).length;
 		characters.innerHTML = formatNumber(characterCount, 'character');
 		bytes.innerHTML = formatNumber(byteCount, 'byte');
 		permalink.hash = encodedValue;
@@ -73,7 +73,7 @@
 }(this, document));
 
 // Google Analytics
-var _gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
+window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
 	var g = d.createElement(t),
 	    s = d.getElementsByTagName(t)[0];
