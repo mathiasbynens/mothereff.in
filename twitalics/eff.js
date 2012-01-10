@@ -5,8 +5,9 @@
 	    textarea = document.getElementsByTagName('textarea')[0],
 	    checkboxes = document.getElementsByTagName('input'),
 	    serif = checkboxes[0],
-	    italic = checkboxes[1],
-	    bold = checkboxes[2],
+	    script = checkboxes[1],
+	    italic = checkboxes[2],
+	    bold = checkboxes[3],
 	    permalink = document.getElementById('permalink'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -30,6 +31,14 @@
 		el.textContent != null && (el.textContent = str);
 	}
 
+	function extend(destination, source) {
+		var key;
+		for (key in source) {
+			// `hasOwnProperty` is overkill here
+			destination[key] = source[key];
+		}
+	}
+
 	function replace(string, lowercaseCode, type) {
 		return string.replace(regexAlpha, function(character) {
 				var charCode = character.charCodeAt(),
@@ -46,6 +55,12 @@
 		'serif': function(result, type) {
 			// There are no mathematical serif characters that aren’t also bold, italicized or formatted in a way
 			return result;
+		},
+		'serif-script-italic': function(result, type) {
+			return replace(result, 0xdc55, type);
+		},
+		'serif-script-italic-bold': function(result, type) {
+			return replace(result, 0xdc89, type);
 		},
 		'serif-italic': function(result, type) {
 			return replace(result, 0xdbed, type);
@@ -69,18 +84,37 @@
 
 	// `h` is kind of in a weird place
 	switchObj['serif-italic'].h = '\ud835\ude29';
+	// exceptions for ‘script’: http://www.w3.org/TR/xml-entity-names/script.html
+	extend(switchObj['serif-script-italic'], {
+		'B': '\u212c',
+		'E': '\u2130',
+		'F': '\u2131',
+		'H': '\u210b',
+		'I': '\u2110',
+		'L': '\u2112',
+		'M': '\u2133',
+		'R': '\u211b',
+		'e': '\u212f',
+		'g': '\u210a',
+		'o': '\u2134'
+	});
 
 	function update() {
 		var value = textarea.value,
 		    result = value,
 		    settings = [];
 
-		serif.checked && settings.push('serif');
-		italic.checked && settings.push('italic');
+		if (script.checked) {
+			serif.checked = serif.disabled = italic.checked = italic.disabled = true;
+			settings.push('serif-script-italic');
+		} else {
+			serif.checked && settings.push('serif');
+			italic.checked && settings.push('italic');
+			serif.disabled = !italic.checked && !bold.checked;
+			italic.disabled = false;
+		}
 		bold.checked && settings.push('bold');
 		settings = settings.join('-');
-
-		serif.disabled = !italic.checked && !bold.checked;
 
 		result = (switchObj[settings])(result, settings);
 		text(code, result);
@@ -91,7 +125,7 @@
 		permalink.hash = encodeURIComponent(textarea.value);
 	}
 
-	textarea.onkeyup = serif.onchange = italic.onchange = bold.onchange = update;
+	textarea.onkeyup = script.onchange = serif.onchange = italic.onchange = bold.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();
