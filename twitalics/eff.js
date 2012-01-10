@@ -21,7 +21,7 @@
 	    stringFromCharCode = String.fromCharCode,
 	    regexAlpha = /[a-zA-Z]/g,
 	    regexNum = /[0-9]/g,
-	    switchObj;
+	    types;
 
 	function text(el, str) {
 		if (str == null) {
@@ -43,49 +43,27 @@
 		return string.replace(regexAlpha, function(character) {
 				var charCode = character.charCodeAt(),
 				    isUppercase = charCode < 97,
-				    typeRef = switchObj[type];
+				    typeRef = types[type];
 				return typeRef[character] || (typeRef[character] = stringFromCharCode(0xd835, charCode + lowercaseCode + (isUppercase ? 6 : 0)));
 			});
 	}
 
-	switchObj = {
-		'': function(result, type) {
-			return result;
-		},
-		'serif': function(result, type) {
-			// There are no mathematical serif characters that aren’t also bold, italicized or formatted in a way
-			return result;
-		},
-		'serif-script-italic': function(result, type) {
-			return replace(result, 0xdc55, type);
-		},
-		'serif-script-italic-bold': function(result, type) {
-			return replace(result, 0xdc89, type);
-		},
-		'serif-italic': function(result, type) {
-			return replace(result, 0xdbed, type);
-		},
-		'serif-bold': function(result, type) {
-			return replace(result, 0xdbb9, type);
-		},
-		'serif-italic-bold': function(result, type) {
-			return replace(result, 0xdc21, type);
-		},
-		'italic': function(result, type) {
-			return replace(result, 0xddc1, type);
-		},
-		'italic-bold': function(result, type) {
-			return replace(result, 0xddf5, type);
-		},
-		'bold': function(result, type) {
-			return replace(result, 0xdbb9, type);
-		}
+	types = window.types = {
+		// `new Number` is needed since we want to add properties to the numbers later (cache)
+		'serif-script-italic': new Number(0xdc55),
+		'serif-script-italic-bold': new Number(0xdc89),
+		'serif-italic': new Number(0xdbed),
+		'serif-bold': new Number(0xdbb9),
+		'serif-italic-bold': new Number(0xdc21),
+		'italic': new Number(0xddc1),
+		'italic-bold': new Number(0xddf5),
+		'bold': new Number(0xdd8d)
 	};
 
 	// `h` is kind of in a weird place
-	switchObj['serif-italic'].h = '\ud835\ude29';
+	types['serif-italic'].h = '\ud835\ude29';
 	// exceptions for ‘script’: http://www.w3.org/TR/xml-entity-names/script.html
-	extend(switchObj['serif-script-italic'], {
+	extend(types['serif-script-italic'], {
 		'B': '\u212c',
 		'E': '\u2130',
 		'F': '\u2131',
@@ -116,7 +94,11 @@
 		bold.checked && settings.push('bold');
 		settings = settings.join('-');
 
-		result = (switchObj[settings])(result, settings);
+		if (settings && settings != 'serif') {
+			// There are no mathematical serif characters that aren’t also bold, italicized or formatted in a way
+			result = replace(result, types[settings], settings);
+		}
+
 		text(code, result);
 
 		if (storage) {
