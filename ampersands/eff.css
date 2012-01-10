@@ -91,7 +91,7 @@ textarea {
 	background: #ffb6c1;
 }
 
-@media (min-width: 50em) {
+@media (min-width: 42em) {
 
 	html {
 		font-size: 1.2em;
