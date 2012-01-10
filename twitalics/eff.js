@@ -78,14 +78,13 @@
 		serif.checked && settings.push('serif');
 		italic.checked && settings.push('italic');
 		bold.checked && settings.push('bold');
+		settings = settings.join('-');
 
 		serif.disabled = !italic.checked && !bold.checked;
 
-		settings = settings.join('-');
-
 		result = (switchObj[settings])(result, settings);
-
 		text(code, result);
+
 		if (storage) {
 			storage.twitalicsText = value;
 		}
