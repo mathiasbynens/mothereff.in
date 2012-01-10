@@ -4,8 +4,9 @@
 	    code = document.getElementsByTagName('code')[0],
 	    textarea = document.getElementsByTagName('textarea')[0],
 	    checkboxes = document.getElementsByTagName('input'),
-	    italic = checkboxes[0],
-	    bold = checkboxes[1],
+	    serif = checkboxes[0],
+	    italic = checkboxes[1],
+	    bold = checkboxes[2],
 	    permalink = document.getElementById('permalink'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -17,15 +18,9 @@
 	    	} catch(e) {}
 	    }()),
 	    stringFromCharCode = String.fromCharCode,
-	    cache = {
-	    	'italic': {
-	    		// `h` is kind of in a weird place
-	    		'h': '\ud835\ude29'
-	    	},
-	    	'bold': {},
-	    	'both': {}
-	    },
-	    regexAlpha = /[a-zA-Z]/g;
+	    regexAlpha = /[a-zA-Z]/g,
+	    regexNum = /[0-9]/g,
+	    switchObj;
 
 	function text(el, str) {
 		if (str == null) {
@@ -35,24 +30,62 @@
 		el.textContent != null && (el.textContent = str);
 	}
 
-	function replace(string, lowercaseCode, uppercaseCode, type) {
+	function replace(string, lowercaseCode, type) {
 		return string.replace(regexAlpha, function(character) {
 				var charCode = character.charCodeAt(),
-				    isUppercase = charCode < 97;
-				return cache[type][character] || (cache[type][character] = stringFromCharCode(0xd835, (isUppercase ? uppercaseCode : lowercaseCode) + charCode));
-			})
+				    isUppercase = charCode < 97,
+				    typeRef = switchObj[type];
+				return typeRef[character] || (typeRef[character] = stringFromCharCode(0xd835, charCode + lowercaseCode + (isUppercase ? 6 : 0)));
+			});
 	}
+
+	switchObj = {
+		'': function(result, type) {
+			return result;
+		},
+		'serif': function(result, type) {
+			// There are no mathematical serif characters that aren’t also bold, italicized or formatted in a way
+			return result;
+		},
+		'serif-italic': function(result, type) {
+			return replace(result, 0xdbed, type);
+		},
+		'serif-bold': function(result, type) {
+			return replace(result, 0xdbb9, type);
+		},
+		'serif-italic-bold': function(result, type) {
+			return replace(result, 0xdc21, type);
+		},
+		'italic': function(result, type) {
+			return replace(result, 0xddc1, type);
+		},
+		'italic-bold': function(result, type) {
+			return replace(result, 0xddf5, type);
+		},
+		'bold': function(result, type) {
+			return replace(result, 0xdbb9, type);
+		}
+	};
+
+	// `h` is kind of in a weird place
+	switchObj['serif-italic'].h = '\ud835\ude29';
 
 	function update() {
 		var value = textarea.value,
-		    result = value;
-		if (italic.checked && bold.checked) {
-			result = replace(result, 0xdc21, 0xdc27, 'both');
-		} else if (italic.checked) {
-			result = replace(result, 0xdbed, 0xdbf3, 'italic');
-		} else if (bold.checked) {
-			result = replace(result, 0xdbb9, 0xdbbf, 'bold');
-		}
+		    result = value,
+		    settings = [];
+
+		serif.checked && settings.push('serif');
+		italic.checked && settings.push('italic');
+		bold.checked && settings.push('bold');
+
+		serif.disabled = !italic.checked && !bold.checked;
+
+		settings = settings.join('-');
+		console.log(settings);
+
+		result = (switchObj[settings])(result, settings);
+
 		text(code, result);
 		if (storage) {
 			storage.twitalicsText = value;
@@ -60,7 +93,7 @@
 		permalink.hash = encodeURIComponent(textarea.value);
 	}
 
-	textarea.onkeyup = italic.onchange = bold.onchange = update;
+	textarea.onkeyup = serif.onchange = italic.onchange = bold.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();
