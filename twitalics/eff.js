@@ -82,7 +82,6 @@
 		serif.disabled = !italic.checked && !bold.checked;
 
 		settings = settings.join('-');
-		console.log(settings);
 
 		result = (switchObj[settings])(result, settings);
 
