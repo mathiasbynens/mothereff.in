@@ -24,7 +24,8 @@
 	    	},
 	    	'bold': {},
 	    	'both': {}
-	    };
+	    },
+	    regexAlpha = /[a-zA-Z]/g;
 
 	function text(el, str) {
 		if (str == null) {
@@ -35,7 +36,7 @@
 	}
 
 	function replace(string, lowercaseCode, uppercaseCode, type) {
-		return string.replace(/[a-zA-Z]/g, function(character) {
+		return string.replace(regexAlpha, function(character) {
 				var charCode = character.charCodeAt(),
 				    isUppercase = charCode < 97;
 				return cache[type][character] || (cache[type][character] = stringFromCharCode(0xd835, (isUppercase ? uppercaseCode : lowercaseCode) + charCode));
