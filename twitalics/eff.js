@@ -79,6 +79,14 @@
 		'g': '\u210a',
 		'o': '\u2134'
 	});
+	// missing characters in non-bold Fraktur script:
+	extend(types['serif-script-fraktur'], {
+		'C': '\ud835\udd6e',
+		'H': '\ud835\udd73',
+		'I': '\ud835\udd74',
+		'R': '\ud835\udd7d',
+		'Z': '\ud835\udd85'
+	})
 
 	function update() {
 		var value = textarea.value,
