@@ -6,8 +6,9 @@
 	    checkboxes = document.getElementsByTagName('input'),
 	    serif = checkboxes[0],
 	    script = checkboxes[1],
-	    italic = checkboxes[2],
-	    bold = checkboxes[3],
+	    fraktur = checkboxes[2],
+	    italic = checkboxes[3],
+	    bold = checkboxes[4],
 	    permalink = document.getElementById('permalink'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -52,6 +53,8 @@
 		// `new Number` is needed since we want to add properties to the numbers later (cache)
 		'serif-script-italic': new Number(0xdc55),
 		'serif-script-italic-bold': new Number(0xdc89),
+		'serif-script-fraktur': new Number(0xdcbd),
+		'serif-script-fraktur-bold': new Number(0xdd25),
 		'serif-italic': new Number(0xdbed),
 		'serif-bold': new Number(0xdbb9),
 		'serif-italic-bold': new Number(0xdc21),
@@ -82,14 +85,20 @@
 		    result = value,
 		    settings = [];
 
-		if (script.checked) {
+		if (fraktur.checked) {
+			serif.checked = script.checked = script.disabled = serif.disabled = italic.disabled = true;
+			italic.checked = false;
+			settings.push('serif-script-fraktur');
+		} else if (script.checked) {
 			serif.checked = serif.disabled = italic.checked = italic.disabled = true;
+			script.disabled = false;
 			settings.push('serif-script-italic');
 		} else {
 			serif.checked && settings.push('serif');
+			script.checked && settings.push('script');
 			italic.checked && settings.push('italic');
-			serif.disabled = !italic.checked && !bold.checked;
-			italic.disabled = false;
+			serif.disabled = !(italic.checked || bold.checked || fraktur.checked);
+			italic.disabled = script.disabled = false;
 		}
 		bold.checked && settings.push('bold');
 		settings = settings.join('-');
@@ -107,7 +116,7 @@
 		permalink.hash = encodeURIComponent(textarea.value);
 	}
 
-	textarea.onkeyup = script.onchange = serif.onchange = italic.onchange = bold.onchange = update;
+	textarea.onkeyup = script.onchange = fraktur.onchange = serif.onchange = italic.onchange = bold.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();
