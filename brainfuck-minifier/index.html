@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>Brainfuck minifier</title>
+<meta name=viewport content="width=device-width">
+<link rel=stylesheet href=eff.css>
+<meta name=description content="An on-the-fly brainfuck minifier.">
+<h1>Brainfuck minifier</h1>
+<noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
+<h2>Input</h2>
+<textarea autofocus>+++++ +++++        initialize counter (cell #0) to 10
+[ use loop to set the next four cells to 70/100/30/10
+    > +++++ ++                      add  7 to cell #1
+    > +++++ +++++                   add 10 to cell #2
+    > +++                           add  3 to cell #3
+    > +                             add  1 to cell #4
+    &lt;&lt;&lt;&lt; -                decrement counter (cell #0)
+]
+> ++ .                                      print 'H'
+> + .                                       print 'e'
++++++ ++ .                                  print 'l'
+.                                           print 'l'
++++ .                                       print 'o'
+> ++ .                                      print ' '
+&lt;&lt; +++++ +++++ +++++ .                      print 'W'
+> .                                         print 'o'
++++ .                                       print 'r'
+----- - .                                   print 'l'
+----- --- .                                 print 'd'
+> + .                                       print '!'
+> .                                         print '\n'</textarea>
+<h2>Minified result (<a href=#%E2%82%AC id=permalink>permalink</a>)</h2>
+<pre><code id=output>++++++++++[>+++++++>++++++++++>+++>+&lt;&lt;&lt;&lt;-]>++.>+.+++++++..+++.>++.&lt;&lt;+++++++++++++++.>.+++.------.--------.>+.>.</code></pre>
+<dl>
+	<dt>Before
+		<dd>1,082 bytes
+	<dt>After
+		<dd>111 bytes
+	<dt>Compression ratio
+		<dd>89.74%
+</dl>
+<h2>About brainfuck</h2>
+<p><a href=http://esolangs.org/wiki/Brainfuck>Brainfuck</a> <i>(not capitalized except at the start of a sentence)</i> is an esoteric programming language. It has eight commands — <code>+-&lt;>[],.</code> — and ignores all other characters. As a result, no special syntax for comments is needed, as long as the comments don’t contain the command characters.
+<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/brainfuck-minifier>fork this on GitHub!</a></p>
+<script src=eff.js></script>
