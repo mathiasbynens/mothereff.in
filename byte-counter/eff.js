@@ -4,6 +4,7 @@
 	    characters = document.getElementById('characters'),
 	    bytes = document.getElementById('bytes'),
 	    permalink = document.getElementById('permalink'),
+	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	try {
@@ -36,7 +37,7 @@
 	}
 
 	function formatNumber(number, unit) {
-		return String(number).replace(/(?=(?:\d{3})+$)(?!\b)/g, ',') + ' ' + unit + (number == 1 ? '' : 's');
+		return String(number).replace(regexNumberGroup, ',') + ' ' + unit + (number == 1 ? '' : 's');
 	}
 
 	function update() {
