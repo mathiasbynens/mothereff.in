@@ -47,7 +47,7 @@
 			    longhand = hexadecimal.length > 2,
 			    escape;
 			if (checkbox.checked && /[ -&(-~]/.test(character)) {
-				// it’s a printable ASCII character (or `'`); don’t escape it
+				// it’s a printable ASCII character that is not `'`; don’t escape it
 				return character;
 			}
 			if (cache[character]) {
