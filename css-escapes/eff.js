@@ -1,6 +1,7 @@
 (function(window, document) {
 
 	var input = document.getElementsByTagName('div')[0],
+	    checkbox = document.getElementsByTagName('input')[0],
 	    quotes = document.getElementsByTagName('b'),
 	    marks = document.getElementsByTagName('mark'),
 	    css = marks[0],
@@ -9,12 +10,23 @@
 	    permalink = document.getElementById('permalink'),
 	    example = document.getElementById('example'),
 	    whitespace = document.getElementById('whitespace'),
-	    escaped = {
-	    	"'":      "\\'",
-	    	'\\':     '\\\\',
-	    	'\n':     '\\n',
+	    supplements = document.getElementById('supplementary-characters'),
+	    jsCache = {
+	    	// http://es5.github.com/#x7.8.4
+	    	// Table 4 — String Single Character Escape Sequences
+	    	'\b': '\\b',
+	    	'\t': '\\t',
+	    	'\n': '\\n',
+	    	'\v': '\\x0b', // In IE < 9, '\v' == 'v'
+	    	'\f': '\\f',
+	    	'\r': '\\r',
+	    	// escape double quotes, \u2028, and \u2029 too, as they break input
+	    	'\"': '\\\"',
 	    	'\u2028': '\\u2028',
-	    	'\u2029': '\\u2029'
+	    	'\u2029': '\\u2029',
+	    	// we’re wrapping the string in single quotes, so escape those too
+	    	'\'': '\\\'',
+	    	'\\': '\\\\'
 	    },
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -41,33 +53,81 @@
 		return array;
 	}
 
-	// http://mathiasbynens.be/notes/html5-id-class#css
-	function cssEscape(str) {
-		var firstChar = str.charAt(0),
-		    result = '';
-		if (/^-+$/.test(str)) {
-			return '\\-' + str.slice(1);
+	// http://mathiasbynens.be/notes/css-escapes#css
+	function cssEscape(string, escapeNonASCII) {
+		// Based on `ucs2decode` from http://mths.be/punycode
+		var firstChar = string.charAt(0),
+		    output = '',
+		    counter = 0,
+		    length = string.length,
+		    value,
+		    character,
+		    charCode,
+		    surrogatePairCount = 0,
+		    extraCharCode; // low surrogate
+
+		while (counter < length) {
+			character = string.charAt(counter++);
+			charCode = character.charCodeAt();
+			// if it’s a non-ASCII character and those need to be escaped
+			if (escapeNonASCII && (charCode < 32 || charCode > 126)) {
+				if ((charCode & 0xF800) == 0xD800) {
+					surrogatePairCount++;
+					extraCharCode = string.charCodeAt(counter++);
+					if ((charCode & 0xFC00) != 0xD800 || (extraCharCode & 0xFC00) != 0xDC00) {
+						throw Error('UCS-2(decode): illegal sequence');
+					}
+					charCode = ((charCode & 0x3FF) << 10) + (extraCharCode & 0x3FF) + 0x10000;
+				}
+				value = '\\' + charCode.toString(16) + ' ';
+			} else {
+				// \r is already tokenized away at this point
+				if (/[\t\n\v\f]/.test(character)) {
+					value = '\\' + charCode.toString(16) + ' ';
+				} else if (/[ !"#$%&'()*+,./:;<=>?@\[\\\]^_`{|}~]/.test(character)) {
+					value = '\\' + character;
+				} else {
+					value = character;
+				}
+			}
+			output += value;
 		}
-		if (/^--/.test(str)) {
-			result = '\\-';
-			str = str.slice(1);
+
+		if (/^-+/.test(output)) {
+			output = '\\-' + output.slice(1);
 		}
 		if (/\d/.test(firstChar)) {
-			result = '\\3' + firstChar + ' ';
-			str = str.slice(1);
+			output = '\\3' + firstChar + ' ' + output.slice(1);
 		}
-		result += map(str.split(''), function(chr) {
-			if (/[\t\n\v\f]/.test(chr)) {
-				return '\\' + chr.charCodeAt().toString(16) + ' ';
+
+		return {
+			'surrogatePairCount': surrogatePairCount,
+			'output': output
+		};
+	}
+
+	// Taken from mothereff.in/js-escapes
+	function jsEscape(str) {
+		return str.replace(/[\s\S]/g, function(character) {
+			var charCode = character.charCodeAt(),
+			    hexadecimal = charCode.toString(16),
+			    longhand = hexadecimal.length > 2,
+			    escape;
+			if (/[\x20-\x26\x28-\x5b\x5d-\x7e]/.test(character)) {
+				// it’s a printable ASCII character that is not `'` or `\`; don’t escape it
+				return character;
 			}
-			return (/[ !"#$%&'()*+,./:;<=>?@\[\\\]^_`{|}~]/.test(chr) ? '\\' : '') + chr;
-		}).join('');
-		return result;
+			if (jsCache[character]) {
+				return jsCache[character];
+			}
+			escape = jsCache[character] = '\\' + (longhand ? 'u' : 'x') + ('0000' + hexadecimal).slice(longhand ? -4 : -2);
+			return escape;
+		});
 	}
 
 	function doubleSlash(str) {
 		return str.replace(/['\n\u2028\u2029\\]/g, function(chr) {
-			return escaped[chr];
+			return jsCache[chr];
 		});
 	}
 
@@ -82,11 +142,14 @@
 	function update(event) {
 		// \r\n and \r become \n in the tokenizer as per HTML5
 		var value = text(input).replace(/\r\n?/g, '\n'),
-		    cssValue = '#' + cssEscape(value),
+		    escapeResult = cssEscape(value, checkbox.checked),
+		    cssValue = '#' + escapeResult.output,
+		    surrogatePairCount = escapeResult.surrogatePairCount,
 		    qsaValue = doubleSlash(cssValue),
-		    jsValue = doubleSlash(value).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
-		    link = '#' + encodeURIComponent(value);
-		whitespace.style.display = /\s/.test(value) ? 'block' : 'none';
+		    jsValue = (checkbox.checked ? jsEscape(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
+		    link = '#' + (+checkbox.checked) + encodeURIComponent(value);
+		whitespace.className = /\s/.test(value) ? 'show' : '';
+		supplements.className = surrogatePairCount ? 'show' : '';
 		forEach(quotes, function(el) {
 			text(el, ~value.indexOf('"') ? '\'' : '"');
 		});
@@ -95,10 +158,10 @@
 		text(js, jsValue);
 		permalink.href = link;
 		storage && (storage.cssEscapes = value);
-		example.href = 'data:text/html;charset=utf-8,' + encodeURIComponent('<!DOCTYPE html><title>Mothereffing CSS escapes example</title><style>pre{background:#eee;padding:.5em}p{display:none}' + cssValue + '{display:block}</style><h1><a href="http://mothereff.in/css-escapes' + link + '">Mothereffing CSS escapes</a> example</h1><pre><code>' + value.replace(/</g, '&lt;') + '</code></pre><p id="' + value.replace(/"/g, '&quot;') + '">If you can read this, the escaped CSS selector worked. </p><script>document.getElementById(\'' + jsValue + '\').innerHTML += \' <code>document.getElementById</code> worked.\';document.querySelector(\'' + qsaValue + '\').innerHTML+=\' <code>document.querySelector</code> worked.\'<\/script>');
+		example.href = 'data:text/html;charset=utf-8,' + encodeURIComponent('<!DOCTYPE html><title>Mothereffing CSS escapes example</title><style>pre{background:#eee;padding:.5em}.test{display:none}' + cssValue + '{display:block}.pass{background:lime}.fail{background:red}</style><h1><a href="http://mothereff.in/css-escapes' + link + '">Mothereffing CSS escapes</a> example</h1><pre><code>' + value.replace(/</g, '&lt;') + '</code></pre><p id="' + value.replace(/"/g, '&quot;') + '" class=test>If you can read this, the escaped CSS selector worked. </p>' + (surrogatePairCount ? '<p>Standard CSS character escape sequences for supplementary Unicode characters aren’t currently supported in WebKit. <strong>This test case will fail in those browsers.</strong> It’s better to leave these characters unescaped.</p>' : '') + '<script>var el=document.getElementsByTagName(\'p\')[0];try{document.getElementById(\'' + jsValue + '\').innerHTML += \' <code>document.getElementById</code> worked.\';document.querySelector(\'' + qsaValue + '\').innerHTML+=\' <code>document.querySelector</code> worked.\';el.className=\'pass\'}catch(e){el.innerHTML=\'FAIL\';el.className=\'fail\'}<\/script>');
 	}
 
-	input.onkeyup = update;
+	input.onkeyup = checkbox.onchange = update;
 	input.oninput = function() {
 		this.onkeyup = null;
 		update();
@@ -110,7 +173,8 @@
 	}
 
 	window.onhashchange = function() {
-		text(input, decodeURIComponent(location.hash.slice(1)));
+		location.hash.charAt(1) == '1' && (checkbox.checked = true);
+		text(input, decodeURIComponent(location.hash.slice(2)));
 	};
 	if (location.hash) {
 		window.onhashchange();

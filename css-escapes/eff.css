@@ -41,20 +41,19 @@ mark {
 	padding: .2em;
 }
 
-#whitespace {
-	display: none;
-	font-weight: bold;
-	color: #b00b00;
-}
-
-a {
+a, label {
 	color: #333;
 	text-decoration: none;
 	border-bottom: 1px solid #aaa;
 	padding: .1em .2em;
+	cursor: pointer;
 }
 
-a:hover, a:focus {
+label {
+	cursor: help;
+}
+
+a:hover, a:focus, label:hover {
 	color: #fff;
 	border-color: #036;
 	background: #36c;
@@ -107,6 +106,16 @@ code {
 
 .method {
 	color: #606;
+}
+
+#whitespace, #supplementary-characters {
+	display: none;
+	font-weight: bold;
+	color: #b00b00;
+}
+
+#whitespace.show, #supplementary-characters.show {
+	display: block;
 }
 
 @media (min-width: 42em) {
