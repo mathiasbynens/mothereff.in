@@ -6,11 +6,14 @@
 	    invalid = document.getElementById('invalid'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
+	    	var uid = new Date,
+	    	    storage,
+	    	    result;
 	    	try {
-	    		var storage = window.localStorage,
-	    		    uid = new Date;
-	    		storage.setItem(uid, uid);
-	    		return storage.getItem(uid) == uid && storage;
+	    		(storage = window.localStorage).setItem(uid, uid);
+	    		result = storage.getItem(uid) == uid;
+	    		storage.removeItem(uid);
+	    		return result && storage;
 	    	} catch(e) {}
 	    }());
 
