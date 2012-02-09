@@ -2239,7 +2239,7 @@
 		});
 		ambiguousAmpersandCount = ambiguousAmpersands.length;
 		semilessCount = semiless.length;
-		link = '<a href=#' + encodeURIComponent(value) + '>#</a>';
+		link = '<a href=#' + encode(value) + '>#</a>';
 		output.className = ambiguousAmpersandCount || semilessCount ? 'fail' : '';
 		output.innerHTML = '<p>' + link + ' Found ' + formatNumber(ambiguousAmpersandCount, 'ambiguous ampersand') + (ambiguousAmpersandCount ? ': <ul><li><code>' + encodeAmpersands(ambiguousAmpersands.join('</code><li><code>')) + '</code></ul>' : '. ') + '<p>Found ' + formatNumber(semilessCount, 'character reference') + ' that ' + (semilessCount == 1 ? 'doesn’t' : 'don’t') + ' end with a semicolon' + (semilessCount ? ': <ul><li><code>' + encodeAmpersands(semiless.join('</code><li><code>')) + '</code></ul>' : '.');
 		storage && (storage.ampersandText = value);
