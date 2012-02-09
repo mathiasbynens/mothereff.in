@@ -36,13 +36,20 @@
 		return output;
 	}
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function formatNumber(number, unit) {
 		return String(number).replace(regexNumberGroup, ',') + ' ' + unit + (number == 1 ? '' : 's');
 	}
 
 	function update() {
 		var value = textarea.value.replace(/\r\n/g, '\n'),
-		    encodedValue = encodeURI(value),
+		    encodedValue = encode(value),
 		    byteCount = ~-encodedValue.split(/%..|./).length, // https://gist.github.com/1010324
 		    characterCount = ucs2decode(value).length;
 		characters.innerHTML = formatNumber(characterCount, 'character');

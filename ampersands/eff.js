@@ -19,6 +19,13 @@
 	    }()),
 	    characterReferences;
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function formatNumber(number, unit) {
 		return (number == 0 ? 'no' : String(number).replace(regexNumberGroup, ',')) + ' ' + unit + (number == 1 ? '' : 's');
 	}
@@ -2209,7 +2216,7 @@
 		var value = textarea.value,
 		    ambiguousAmpersands = [],
 		    ambiguousAmpersandCount,
-		    link = '<a href=#' + encodeURIComponent(value) + '>#</a>',
+		    link = '<a href=#' + encode(value) + '>#</a>',
 		    semiless = [],
 		    semilessCount;
 

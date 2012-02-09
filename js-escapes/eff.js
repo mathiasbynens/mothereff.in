@@ -31,6 +31,13 @@
 	    	'\'': '\\\''
 	    };
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function text(el, str) {
 		if (str == null) {
 			return el.innerText || el.textContent;
@@ -84,7 +91,7 @@
 				storage.removeItem('jsEscapeCheckbox');
 			}
 		}
-		permalink.hash = +checkbox.checked + encodeURIComponent(textarea.value);
+		permalink.hash = +checkbox.checked + encode(textarea.value);
 	}
 
 	textarea.onkeyup = checkbox.onchange = update;

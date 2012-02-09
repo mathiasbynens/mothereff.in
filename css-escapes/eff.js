@@ -38,6 +38,13 @@
 	    	} catch(e) {}
 	    }());
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function forEach(array, fn) {
 		var length = array.length;
 		while (length--) {
@@ -147,7 +154,7 @@
 		    surrogatePairCount = escapeResult.surrogatePairCount,
 		    qsaValue = doubleSlash(cssValue),
 		    jsValue = (checkbox.checked ? jsEscape(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
-		    link = '#' + (+checkbox.checked) + encodeURIComponent(value);
+		    link = '#' + (+checkbox.checked) + encode(value);
 		whitespace.className = /\s/.test(value) ? 'show' : '';
 		supplements.className = surrogatePairCount ? 'show' : '';
 		forEach(quotes, function(el) {

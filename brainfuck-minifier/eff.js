@@ -22,14 +22,6 @@
 	    }()),
 	    characterReferences;
 
-	function text(el, str) {
-		if (str == null) {
-			return el.innerText || el.textContent;
-		}
-		el.innerText != null && (el.innerText = str);
-		el.textContent != null && (el.textContent = str);
-	}
-
 	// Taken from http://mths.be/punycode
 	function ucs2decode(string) {
 		var output = [],
@@ -49,6 +41,21 @@
 			output.push(value);
 		}
 		return output;
+	}
+
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
+	function text(el, str) {
+		if (str == null) {
+			return el.innerText || el.textContent;
+		}
+		el.innerText != null && (el.innerText = str);
+		el.textContent != null && (el.textContent = str);
 	}
 
 	function formatNumber(number, unit) {
@@ -75,7 +82,7 @@
 		text(after, formatNumber(resultingByteCount, 'byte'));
 		text(ratio, (originalByteCount ? ((originalByteCount - resultingByteCount) / originalByteCount * 100) : 0).toFixed(2) + '%');
 
-		permalink.hash = encodeURIComponent(value);
+		permalink.hash = encode(value);
 		storage && (storage.brainfuck = value);
 	};
 

@@ -24,6 +24,13 @@
 	    regexNum = /[0-9]/g,
 	    types;
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function text(el, str) {
 		if (str == null) {
 			return el.innerText || el.textContent;
@@ -121,7 +128,7 @@
 		if (storage) {
 			storage.twitalicsText = value;
 		}
-		permalink.hash = encodeURIComponent(textarea.value);
+		permalink.hash = encode(textarea.value);
 	}
 
 	textarea.onkeyup = script.onchange = fraktur.onchange = serif.onchange = italic.onchange = bold.onchange = update;

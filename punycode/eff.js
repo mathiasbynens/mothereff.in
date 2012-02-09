@@ -14,6 +14,13 @@
 	    	} catch(e) {}
 	    }());
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function text(el, str) {
 		if (str == null) {
 			return el.innerText || el.textContent;
@@ -31,7 +38,7 @@
 			value = text(decoded);
 			result = toASCII(value);
 			text(element, result);
-			permalink.href = '#' + encodeURIComponent(value);
+			permalink.href = '#' + encode(value);
 		} else {
 			element = decoded;
 			value = text(encoded);

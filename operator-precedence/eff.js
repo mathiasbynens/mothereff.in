@@ -14,6 +14,13 @@
 	    	} catch(e) {}
 	    }());
 
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
 	function text(el, str) {
 		if (str == null) {
 			return el.innerText || el.textContent;
@@ -41,7 +48,7 @@
 		    ok = parse(textA) == parse(textB);
 		output.className = ok ? 'pass' : 'fail';
 		output.innerHTML = ok ? 'Yep.' : 'Nope.';
-		permalink.href = '#' + encodeURIComponent(textA + '@' + textB);
+		permalink.href = '#' + encode(textA + '@' + textB);
 	}
 
 	a.onkeyup = b.onkeyup = update;

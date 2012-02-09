@@ -43,20 +43,28 @@
 	    	}
 	    	el.innerText != null && (el.innerText = str);
 	    	el.textContent != null && (el.textContent = str);
-	    },
-	    update = function() {
-	    	var value = input.value,
-	    	    html = isUnquotableHTML(value),
-	    	    css = isUnquotableCSS(value);
-	    	text(markElems.html, value);
-	    	text(markElems.css, value);
-	    	preElems.html.className = html ? 'valid' : 'invalid';
-	    	preElems.css.className = css ? 'valid' : 'invalid';
-	    	text(iElems.html, html ? 'a valid' : 'an invalid');
-	    	text(iElems.css, css ? 'a valid' : 'an invalid');
-	    	permalink.href = '#' + encodeURIComponent(value);
-	    	storage && (storage.unquotedAttributes = value);
 	    };
+
+	function encode(string) {
+		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
+		return encodeURIComponent(string).replace(/['()_*]/g, function(character) {
+			return '%' + character.charCodeAt().toString(16);
+		});
+	}
+
+	function update() {
+		var value = input.value,
+		    html = isUnquotableHTML(value),
+		    css = isUnquotableCSS(value);
+		text(markElems.html, value);
+		text(markElems.css, value);
+		preElems.html.className = html ? 'valid' : 'invalid';
+		preElems.css.className = css ? 'valid' : 'invalid';
+		text(iElems.html, html ? 'a valid' : 'an invalid');
+		text(iElems.css, css ? 'a valid' : 'an invalid');
+		permalink.href = '#' + encode(value);
+		storage && (storage.unquotedAttributes = value);
+	}
 
 	input.onkeydown = update;
 	input.oninput = function() {
