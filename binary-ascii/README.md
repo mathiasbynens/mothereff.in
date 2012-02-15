@@ -1,4 +1,4 @@
-# [Mothereffing binary ↔ ASCII converter](http://mothereff.in/binary-ascii)
+# [Mothereffing binary ↔ ASCII text converter](http://mothereff.in/binary-ascii)
 
 Convert binary digits to extended ASCII text and the other way around.
 

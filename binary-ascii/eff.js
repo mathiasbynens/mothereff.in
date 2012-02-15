@@ -30,7 +30,7 @@
 	}
 
 	function zeroPad(number) {
-		return Array(9).join(0).slice(String(number).length) + number;
+		return '00000000'.slice(String(number).length) + number;
 	}
 
 	function toASCII(string) {
