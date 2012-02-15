@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>Binary ↔ ASCII converter</title>
+<meta name=viewport content="width=device-width">
+<link rel=stylesheet href=eff.css>
+<meta name=description content="An on-the-fly binary ↔ ASCII converter.">
+<h1>Binary ↔ ASCII converter</h1>
+<noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
+<p>ASCII characters are characters whose code points range from <code>0x00</code> to <code>0x7F</code>. So, to encode any ASCII character in binary, we need at least 7 bits. In practice, an 8th bit is added and used as a <i>parity bit</i> to detect transmission errors. However, these 8 bits (1 byte) also allow us to represent a greater range of characters: those with code points in the range from <code>0x00</code> to <code>0xFF</code> – also known as <i>extended ASCII</i>. This tool accepts any character from the extended ASCII character set.
+<h2>Extended ASCII (<a href=#Here%20be%20secret%20messages!!1 id=permalink>permalink</a>)</h2>
+<!-- textarea@pattern is invalid HTML :( https://www.w3.org/Bugs/Public/show_bug.cgi?id=15291 -->
+<textarea pattern="[\x00-\xff]*" autofocus>Here be secret messages!!1</textarea>
+<h2>Binary</h2>
+<textarea pattern="([01]{8})*">0100100001100101011100100110010100100000011000100110010100100000011100110110010101100011011100100110010101110100001000000110110101100101011100110111001101100001011001110110010101110011001000010010000100110001</textarea>
+<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/binary-ascii>fork this on GitHub!</a></p>
+<script src=eff.js></script>

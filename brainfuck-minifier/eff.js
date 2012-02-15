@@ -89,6 +89,7 @@
 		storage && (storage.brainfuck = value);
 	};
 
+	// http://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

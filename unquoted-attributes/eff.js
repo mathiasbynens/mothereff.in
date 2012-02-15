@@ -69,6 +69,7 @@
 		storage && (storage.unquotedAttributes = value);
 	}
 
+	// http://mathiasbynens.be/notes/oninput
 	input.onkeydown = update;
 	input.oninput = function() {
 		this.onkeydown = null;

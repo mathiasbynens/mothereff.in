@@ -2245,6 +2245,7 @@
 		storage && (storage.ampersandText = value);
 	};
 
+	// http://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

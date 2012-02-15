@@ -54,6 +54,7 @@
 		permalink.href = '#' + encode(textA + '@' + textB);
 	}
 
+	// http://mathiasbynens.be/notes/oninput
 	a.onkeyup = b.onkeyup = update;
 	a.oninput = b.oninput = function() {
 		a.onkeyup = b.onkeyup = null;

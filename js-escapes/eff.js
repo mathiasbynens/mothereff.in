@@ -97,6 +97,7 @@
 		permalink.hash = +checkbox.checked + encode(textarea.value);
 	}
 
+	// http://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = checkbox.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

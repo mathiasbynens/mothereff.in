@@ -58,6 +58,7 @@
 		}
 	};
 
+	// http://mathiasbynens.be/notes/oninput
 	decoded.onkeyup = encoded.onkeyup = update;
 	decoded.oninput = encoded.oninput = function() {
 		decoded.onkeyup = encoded.onkeyup = null;

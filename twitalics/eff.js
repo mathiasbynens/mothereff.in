@@ -134,6 +134,7 @@
 		permalink.hash = encode(textarea.value);
 	}
 
+	// http://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = script.onchange = fraktur.onchange = serif.onchange = italic.onchange = bold.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
