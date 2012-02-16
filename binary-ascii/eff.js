@@ -4,9 +4,9 @@
 	    ascii = textareas[0],
 	    binary = textareas[1],
 	    permalink = document.getElementById('permalink'),
-	    regexBinaryGroup = /[01]{8}/g,
+	    regexBinaryGroup = /\s*[01]{8}\s*/g,
 	    regexAnyCharacter = /[\s\S]/g,
-	    regexBinary = /^([01]{8})*$/,
+	    regexBinary = /^(\s*[01]{8}\s*)*$/,
 	    regexExtendedASCII = /^[\x00-\xff]*$/,
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
