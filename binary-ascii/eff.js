@@ -41,7 +41,7 @@
 
 	function toBinary(string) {
 		return string.replace(regexAnyCharacter, function(character) {
-			return zeroPad(character.charCodeAt().toString(2));
+			return zeroPad(character.charCodeAt().toString(2)) + ' ';
 		});
 	}
 
