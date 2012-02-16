@@ -41,8 +41,8 @@ textarea {
 }
 
 textarea {
-	background: #eee;
-	border: 3px double grey;
+	border: 3px double green;
+	background: #90ee90;
 	width: 100%;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -52,8 +52,6 @@ textarea {
 	padding: .7em;
 	resize: vertical;
 	min-height: 9.5em;
-	border: 3px double green;
-	background: #90ee90;
 }
 
 code {
