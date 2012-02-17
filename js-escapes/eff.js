@@ -26,6 +26,7 @@
 	    	'\v': '\\x0b', // In IE < 9, '\v' == 'v'
 	    	'\f': '\\f',
 	    	'\r': '\\r',
+	    	'\0': '\\0',
 	    	// escape double quotes, \u2028, and \u2029 too, as they break input
 	    	'\"': '\\\"',
 	    	'\u2028': '\\u2028',
