@@ -60,7 +60,7 @@
 		if ((isReserved = regexES51ReservedWord.test(tmp)) || !regexIdentifier.test(tmp)) {
 			input.className = 'invalid';
 			output.innerHTML = 'an invalid';
-			es3.className = unicode3.className = '';
+			es3.className = unicode3.className = browser.className = '';
 			reservedWord.className = isReserved && tmp != value ? 'show' : '';
 		} else {
 			output.innerHTML = 'a valid';
