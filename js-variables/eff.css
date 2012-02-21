@@ -41,11 +41,11 @@ i {
 	padding-bottom: 0;
 }
 
-#es3, #unicode-3, #browser {
+#es3, #unicode-3, #browser, #escaped-reserved-word {
 	display: none;
 }
 
-#es3.show, #unicode-3.show, #browser.show {
+#es3.show, #unicode-3.show, #browser.show, #escaped-reserved-word.show {
 	display: block;
 }
 
