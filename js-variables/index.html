@@ -10,6 +10,7 @@
 <noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
 <a href=#%E0%B2%A0%5f%E0%B2%A0 id=permalink>permalink</a> <label>Enter a variable name: <input value=ಠ_ಠ required autofocus placeholder="e.g. ∞"></label>
 <p>That’s <i>a valid</i> identifier according to ECMAScript 5.1 / Unicode 6.1.
+<p id=immutable-properties>However, the <code>NaN</code>, <code>Infinity</code>, and <code>undefined</code> properties of the global object are immutable or read-only. Setting them won’t have an effect. Avoid using this variable name.
 <p id=escaped-reserved-word>However, web browsers are supposed to support it, as long as at least one character is escaped using a Unicode escape sequence.
 <p id=es3>However, it is an ES3 reserved word. You may want to avoid using it if support for older JavaScript engines is a concern.
 <p id=unicode-3>However, it’s not a valid identifier according to Unicode 3.0. You may want to avoid using it if support for older JavaScript engines is a concern.
