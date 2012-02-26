@@ -50,6 +50,8 @@ class RegExpGenerator(object):
       else:
         if start == end:
           buf.append("\\u%04X" % start)
+        elif end == start + 1:
+          buf.append("\\u%04X\\u%04X" % (start, end))
         else:
           buf.append("\\u%04X-\\u%04X" % (start, end))
         start = code
