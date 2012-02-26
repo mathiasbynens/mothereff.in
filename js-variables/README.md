@@ -4,7 +4,7 @@ Wondering if you can use a given string as a variable name in JavaScript? This t
 
 See [_Valid JavaScript variable names_](http://mathiasbynens.be/notes/javascript-identifiers) for the full explanation.
 
-Currently, two separate regular expressions are being used: one to detect if the input string is a [reserved word](http://mathiasbynens.be/notes/javascript-identifiers#reserved-word), and another to check if it’s a valid identifier name. I chose not to do this, but technically it’s possible to merge these two together into a single big-ass regex (11,350 characters):
+Currently, two separate regular expressions are being used: one to detect if the input string is a [reserved word](http://mathiasbynens.be/notes/javascript-identifiers#reserved-word), and another to check if it’s a valid identifier name. I chose not to do this, but technically it’s possible to merge these two together into a single big-ass regex (11,236 characters):
 
 
 
