@@ -3,6 +3,7 @@
 	var input = document.getElementsByTagName('input')[0],
 	    output = document.getElementsByTagName('i')[0],
 	    es3 = document.getElementById('es3'),
+	    zeroWidth = document.getElementById('zero-width'),
 	    unicode3 = document.getElementById('unicode-3'),
 	    browser = document.getElementById('browser'),
 	    reservedWord = document.getElementById('escaped-reserved-word'),
@@ -26,6 +27,8 @@
 	    regexES3ReservedWordExclusive = /^(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)$/,
 	    // Immutable properties of the global object
 	    regexImmutableProps = /^(?:NaN|Infinity|undefined)$/,
+	    // Zero-width characters that are allowed in IdentifierPart as per ES5
+	    regexZeroWidth = /\u200c|\u200d/,
 	    // http://mathiasbynens.be/notes/javascript-escapes#unicode
 	    regexUnicodeEscape = /\\u([a-fA-F0-9]{4})/g,
 	    // http://mathiasbynens.be/notes/localstorage-pattern
@@ -56,7 +59,8 @@
 		    unicodeWarning,
 		    browserWarning,
 		    immutableWarning,
-		    isReserved;
+		    isReserved,
+		    hasZeroWidth;
 		// only Unicode escapes are allowed: http://mathiasbynens.be/notes/javascript-escapes#unicode
 		tmp = value.replace(regexUnicodeEscape, function($0, $1) {
 			return stringFromCharCode(parseInt($1, 16));
@@ -71,6 +75,7 @@
 			es3warning = regexES3ReservedWordExclusive.test(tmp);
 			unicodeWarning = !regexIdentifierUnicode3.test(tmp);
 			immutableWarning = regexImmutableProps.test(tmp);
+			hasZeroWidth = regexZeroWidth.test(tmp);
 			browserWarning = (function() {
 				try {
 					Function('var ' + tmp);
@@ -80,10 +85,11 @@
 			}());
 			reservedWord.className = '';
 			es3.className = es3warning ? 'show' : '';
+			zeroWidth.className = hasZeroWidth ? 'show' : '';
 			unicode3.className = unicodeWarning ? 'show': '';
 			browser.className = browserWarning ? 'show': '';
 			immutableProp.className = immutableWarning ? 'show': '';
-			input.className = es3warning || unicodeWarning || immutableWarning ? 'warning' : '';
+			input.className = es3warning || hasZeroWidth || unicodeWarning || immutableWarning ? 'warning' : '';
 		}
 		permalink.hash = encode(value);
 		storage && (storage.jsVars = value);
