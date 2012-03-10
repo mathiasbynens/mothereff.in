@@ -57,7 +57,7 @@
 			    hexadecimal = charCode.toString(16),
 			    longhand = hexadecimal.length > 2,
 			    escape;
-			if (checkbox.checked && /[ -&(-~]/.test(character)) {
+			if (checkbox.checked && /[\x20-\x26\x28-\x7e]/.test(character)) {
 				// it’s a printable ASCII character that is not `'`; don’t escape it
 				return character;
 			}
@@ -70,11 +70,11 @@
 	}
 
 	function update() {
-		var value = textarea.value;
+		var value = textarea.value.replace(/\\\n/g, ''); // LineContinuation
 		try {
 			text(
 				code,
-				'\'' + unicodeEscape((1,evil)(
+				'\'' + unicodeEscape(evil(
 					'"'
 					+ value.replace(/[\n\u2028\u2029"']/g, function(chr) {
 						return cache[chr];
@@ -113,8 +113,9 @@
 	}
 
 	window.onhashchange = function() {
-		location.hash.charAt(1) == '0' && (checkbox.checked = false);
-		textarea.value = decodeURIComponent(location.hash.slice(2));
+		var hash = location.hash;
+		hash.charAt(1) == '0' && (checkbox.checked = false);
+		textarea.value = decodeURIComponent(hash.slice(2));
 		update();
 	};
 
