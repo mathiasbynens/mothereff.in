@@ -63,7 +63,7 @@
 		return array;
 	}
 
-	// http://mathiasbynens.be/notes/css-escapes#css
+	// http://mathiasbynens.be/notes/css-escapes
 	function cssEscape(string, escapeNonASCII) {
 		// Based on `ucs2decode` from http://mths.be/punycode
 		var firstChar = string.charAt(0),
@@ -103,7 +103,7 @@
 			output += value;
 		}
 
-		if (/^-+/.test(output)) {
+		if (/^-[-\d]/.test(output)) {
 			output = '\\-' + output.slice(1);
 		}
 		if (/\d/.test(firstChar)) {
