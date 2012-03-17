@@ -20,7 +20,7 @@
 	    // Zero-width characters that are allowed in IdentifierPart as per ES5, but not in ES3
 	    regexZeroWidth = /\u200c|\u200d/,
 	    regexNumber = /^[0-9a-fA-FxX\+\-\.]+$/,
-	    regexSingleQuotes = /'/g,
+	    regexSpecialCharacters = /['\\]/g,
 	    regexOctalLiteral = /^0[0-7]+$/,
 	    // http://mathiasbynens.be/notes/javascript-escapes#unicode
 	    regexUnicodeEscape = /\\u([a-fA-F0-9]{4})/g,
@@ -84,7 +84,7 @@
 			needsQuotes = false;
 			quotedValue = '\'' + valueAsNumber + '\'';
 		} else {
-			quotedValue = '\'' + value.replace(regexSingleQuotes, '\\\'') + '\'';
+			quotedValue = '\'' + value.replace(regexSpecialCharacters, '\\$&') + '\'';
 		}
 		em.innerHTML = needsQuotes ? 'need' : 'don’t have';
 		pre1.className = needsQuotes ? 'warning' : '';
