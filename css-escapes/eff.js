@@ -92,9 +92,10 @@
 				value = '\\' + charCode.toString(16) + ' ';
 			} else {
 				// \r is already tokenized away at this point
-				if (/[\t\n\v\f]/.test(character)) {
+				// `:` can be escaped as `\:`, but that fails in IE < 8
+				if (/[\t\n\v\f:]/.test(character)) {
 					value = '\\' + charCode.toString(16) + ' ';
-				} else if (/[ !"#$%&'()*+,./:;<=>?@\[\\\]^_`{|}~]/.test(character)) {
+				} else if (/[ !"#$%&'()*+,./;<=>?@\[\\\]^`{|}~]/.test(character)) {
 					value = '\\' + character;
 				} else {
 					value = character;
@@ -103,6 +104,9 @@
 			output += value;
 		}
 
+		if (/^_/.test(output)) { // Prevent IE6 from ignoring the rule altogether
+			output = '\\_' + output.slice(1);
+		}
 		if (/^-[-\d]/.test(output)) {
 			output = '\\-' + output.slice(1);
 		}
@@ -155,7 +159,8 @@
 		    escapeResult = cssEscape(value, checkbox.checked),
 		    cssValue = '#' + escapeResult.output,
 		    surrogatePairCount = escapeResult.surrogatePairCount,
-		    qsaValue = doubleSlash(cssValue),
+		    // IE 8 can handle leading underscores; no point in escaping them here:
+		    qsaValue = doubleSlash(cssValue.replace(/^#\\_/, '#_')),
 		    jsValue = (checkbox.checked ? jsEscape(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
 		    link = '#' + (+checkbox.checked) + encode(value);
 		whitespace.className = /\s/.test(value) ? 'show' : '';
