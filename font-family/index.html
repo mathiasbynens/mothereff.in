@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>Unquoted CSS font family name validator</title>
+<meta name=viewport content="width=device-width">
+<link rel=stylesheet href=eff.css>
+<meta name=description content="Wondering if you can use a given character sequence as an unquoted font family name in CSS? This tool will tell you.">
+<!--[if lt IE 9]><script>document.createElement('mark')</script><![endif]-->
+<h1>Unquoted CSS font family name validator</h1>
+<p>Wondering if a given character sequence can be used as an unquoted font family name in CSS? <a href=http://mathiasbynens.be/notes/unquoted-font-family>Read all about it</a>, or just use this tool.
+<noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
+<p><label>Enter a font family name: <input value="Hawaii 5-0" required autofocus placeholder="e.g. Comic Sans MS"></label>
+<a href=# id=permalink>permalink</a>
+<label title="Escape any non-printable ASCII characters and non-ASCII characters, e.g. &#96;©&#96; → &#96;\a9 &#96;"><input type=checkbox id=non-ascii> escape non-ASCII</label>
+<div id=unquoted>
+	<p>You <em>can</em> use this as an unquoted font family name in CSS:
+	<pre class=warning><code>font-family: <mark>Hawaii\ 5-0</mark>;</code></pre>
+	<p id=supplementary-characters class=hide><a href=http://mathiasbynens.be/notes/css-escapes>Standard CSS character escape sequences</a> for supplementary Unicode characters aren’t currently supported in WebKit, though. It’s better to leave these characters unescaped.
+</div>
+<div id=string>
+	<p>You can use it with quotes:
+	<pre><code>font-family: <mark>'Hawaii 5-0'</mark>;</code></pre>
+</div>
+<div id=keyword class=hide>
+	<p>If used unquoted, this is a keyword in CSS, and it refers to the keyword value rather than a font family with that name. If you mean to use a font with this name rather than the keyword value, you must use quotes:
+	<pre class=warning><code>font-family: <mark>'sans-serif'</mark>;</code></pre>
+</div>
+<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/font-family>fork this on GitHub!</a></p>
+<script src=eff.js></script>
