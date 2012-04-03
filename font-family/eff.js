@@ -28,6 +28,7 @@
 	    regexSingleQuote = /'/g,
 	    regexLineBreak = /\r\n?/g,
 	    regexSimpleEscapeCharacters = /[ !"#$%&'()*+,.\/;<=>?@\[\\\]^`{|}~]/,
+	    regexSpaceAtStart = /^\x20/,
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
@@ -194,6 +195,10 @@
 		// Escape trailing spaces unless they’re already part of an escape
 		if (regexTrailingSpace.test(result) && !regexTrailingEscape.test(result)) {
 			result = result.replace(regexTrailingSpace, '\\ ');
+		}
+
+		if (regexSpaceAtStart.test(result)) {
+			result = '\\ ' + result.slice(1);
 		}
 
 		return {
