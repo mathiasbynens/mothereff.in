@@ -19,7 +19,7 @@
 	    regexES3ReservedWord = /^(?:do|if|in|for|int|new|try|var|byte|case|char|else|enum|goto|long|null|this|true|void|with|break|catch|class|const|false|final|float|short|super|throw|while|delete|double|export|import|native|public|return|static|switch|throws|typeof|boolean|default|extends|finally|package|private|abstract|continue|debugger|function|volatile|interface|protected|transient|implements|instanceof|synchronized)$/,
 	    // Zero-width characters that are allowed in IdentifierPart as per ES5, but not in ES3
 	    regexZeroWidth = /\u200c|\u200d/,
-	    regexNumber = /^[0-9a-fA-FxX\+\-\.]+$/,
+	    regexNumber = /^(?![+-])([0-9a-fA-FxX\+\-\.]+)$/,
 	    regexSpecialCharacters = /['\\]/g,
 	    regexOctalLiteral = /^0[0-7]+$/,
 	    // http://mathiasbynens.be/notes/javascript-escapes#unicode
@@ -54,7 +54,7 @@
 	}
 
 	function isNumericLiteral(string, number) {
-		// Consider: empty string, `2e2`, `010`, ` 010` (leading space), `1.23`, `.23`, etc.
+		// Consider: empty string, `2e2`, `010`, ` 010` (leading space), `1.23`, `.23`, `+1`, `-0`, etc.
 		return regexNumber.test(string) && !isNaN(number);
 	}
 
