@@ -23,7 +23,7 @@
 	    	'\b': '\\b',
 	    	'\t': '\\t',
 	    	'\n': '\\n',
-	    	'\v': '\\x0b', // In IE < 9, '\v' == 'v'
+	    	'\v': '\\x0B', // In IE < 9, '\v' == 'v'
 	    	'\f': '\\f',
 	    	'\r': '\\r',
 	    	'\0': '\\0',
@@ -54,10 +54,10 @@
 	function unicodeEscape(str) {
 		return str.replace(/[\s\S]/g, function(character) {
 			var charCode = character.charCodeAt(),
-			    hexadecimal = charCode.toString(16),
+			    hexadecimal = charCode.toString(16).toUpperCase(),
 			    longhand = hexadecimal.length > 2,
 			    escape;
-			if (checkbox.checked && /[\x20-\x26\x28-\x7e]/.test(character)) {
+			if (checkbox.checked && /[\x20-\x26\x28-\x7E]/.test(character)) {
 				// it’s a printable ASCII character that is not `'`; don’t escape it
 				return character;
 			}
@@ -79,7 +79,7 @@
 					+ value.replace(/[\n\u2028\u2029"']/g, function(chr) {
 						return cache[chr];
 					})
-					.replace(/\\v/g, '\x0b') // In IE < 9, '\v' == 'v'; this normalizes the input
+					.replace(/\\v/g, '\x0B') // In IE < 9, '\v' == 'v'; this normalizes the input
 					+ '"'
 				)) + '\''
 			);
