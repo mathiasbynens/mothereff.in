@@ -5,6 +5,7 @@
 	    base64 = textareas[1],
 	    permalink = document.getElementById('permalink'),
 	    regexBase64 = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/,
+	    regexWhitespace = /\s/g,
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
@@ -53,18 +54,18 @@
 		    result,
 		    tmp;
 		if (this == base64) {
-			// convert from base64 to Unicode
-			tmp = base64.value;
+			// convert from Base64 to Unicode
+			tmp = base64.value.replace(regexWhitespace, '');
 			if (regexBase64.test(tmp)) {
 				base64.className = unicode.className = '';
-				result = base64decode(base64.value);
+				result = base64decode(tmp);
 				unicode.value = unicodeString = result;
 			} else {
 				unicode.value = 'ERROR: invalid input';
 				base64.className = unicode.className = 'invalid';
 				unicodeString = '';
 			}
-		} else { // convert from Unicode to base64
+		} else { // convert from Unicode to Base64
 			base64.className = unicode.className = '';
 			unicodeString = unicode.value;
 			result = base64encode(unicodeString);
