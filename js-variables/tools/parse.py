@@ -7,6 +7,26 @@ import sys
 import string
 import re
 
+# http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+def highSurrogate(codePoint):
+	return int(math.floor((codePoint - 0x10000) / 0x400) + 0xD800)
+
+def lowSurrogate(codePoint):
+	return int((codePoint - 0x10000) % 0x400 + 0xDC00)
+
+def codePointToString(codePoint):
+	if codePoint == 0:
+		string = '\\0' # http://mathiasbynens.be/notes/javascript-escapes#single
+	elif (codePoint >= 0x41 and codePoint <= 0x5A) or (codePoint >= 0x61 and codePoint <= 0x7A) or (codePoint >= 0x30 and codePoint <= 0x39): # [a-zA-Z0-9]
+		string = chr(codePoint)
+	elif codePoint <= 0xFF: # http://mathiasbynens.be/notes/javascript-escapes#hexadecimal
+		string = '\\x' + '%02X' % codePoint
+	elif codePoint <= 0xFFFF: # http://mathiasbynens.be/notes/javascript-escapes#unicode
+		string = '\\u' + '%04X' % codePoint
+	else: # surrogate pairs
+		string = '\\u' + '%04X' % highSurrogate(codePoint) + '\\u' + '%04X' % lowSurrogate(codePoint)
+	return string
+
 class RegExpGenerator(object):
 	def __init__(self, detector):
 		self.detector = detector
@@ -40,21 +60,21 @@ class RegExpGenerator(object):
 				continue
 			else:
 				if start == end:
-					buf.append('\\u%04X' % start)
+					buf.append('%s' % codePointToString(start))
 				elif end == start + 1:
-					buf.append('\\u%04X\\u%04X' % (start, end))
+					buf.append('%s%s' % (codePointToString(start), codePointToString(end)))
 				else:
-					buf.append('\\u%04X-\\u%04X' % (start, end))
+					buf.append('%s-%s' % (codePointToString(start), codePointToString(end)))
 				start = code
 				end = code
 				predict = code + 1
 
 		if start == end:
-			buf.append('\\u%04X' % start)
+			buf.append('%s' % codePointToString(start))
 		elif end == start + 1:
-			buf.append('\\u%04X\\u%04X' % (start, end))
+			buf.append('%s%s' % (codePointToString(start), codePointToString(end)))
 		else:
-			buf.append('\\u%04X-\\u%04X' % (start, end))
+			buf.append('%s-%s' % (codePointToString(start), codePointToString(end)))
 
 		return ''.join(buf)
 
@@ -62,6 +82,19 @@ class RegExpGenerator(object):
 class Detector(object):
 	def __init__(self, data):
 		self.data = data
+
+	def is_decimal_digit(self, ch):
+		return ch >= ord('0') and ch <= ord('9')
+
+	def is_ascii(self, ch):
+		return ch < 0x80
+
+	def is_ascii_alpha(self, ch):
+		v = ch | 0x20
+		return v >= ord('a') and v <= ord('z')
+
+	def is_ascii_alphanumeric(self, ch):
+		return self.is_decimal_digit(ch) or self.is_ascii_alpha(ch)
 
 	def is_identifier_start(self, ch):
 		if self.is_ascii(ch):
@@ -72,6 +105,14 @@ class Detector(object):
 		if self.is_ascii(ch):
 			return ch == ord('$') or ch == ord('_') or ch == ord('\\') or self.is_ascii_alphanumeric(ch)
 		return self._is_non_ascii_identifier_part(ch)
+
+	def _is_non_ascii_identifier_start(self, ch):
+		c = self.data[ch]
+		return c == 'Lu' or c == 'Ll' or c == 'Lt' or c == 'Lm' or c == 'Lo' or c == 'Nl'
+
+	def _is_non_ascii_identifier_part(self, ch):
+		c = self.data[ch]
+		return c == 'Lu' or c == 'Ll' or c == 'Lt' or c == 'Lm' or c == 'Lo' or c == 'Nl' or c == 'Mn' or c == 'Mc' or c == 'Nd' or c == 'Pc' or ch == 0x200C or ch == 0x200D
 
 	def is_identifier_part_exclusive(self, ch):
 		return self.is_identifier_part(ch) and not self.is_identifier_start(ch)
@@ -109,10 +150,8 @@ def analyze(source):
 
 def main(source):
 	generator = analyze(source)
-	print generator.generate_identifier_start()
+	#print generator.generate_identifier_start()
 	print generator.generate_identifier_part_exclusive()
-	# I manually post-process the generated regex ranges by copy-pasting each
-	# of them into http://mothereff.in/js-escapes. Yes, I’m *that* guy.
 
 if __name__ == '__main__':
 	main(sys.argv[1])
