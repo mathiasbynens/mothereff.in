@@ -3,7 +3,9 @@
 	var pre = document.getElementsByTagName('pre')[0],
 	    code = document.getElementsByTagName('code')[0],
 	    textarea = document.getElementsByTagName('textarea')[0],
-	    checkbox = document.getElementsByTagName('input')[0],
+	    inputs = document.getElementsByTagName('input'),
+	    checkboxOnlyASCII = inputs[0],
+	    checkboxStringBody = inputs[1],
 	    permalink = document.getElementById('permalink'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -56,7 +58,7 @@
 			    hexadecimal = charCode.toString(16).toUpperCase(),
 			    longhand = hexadecimal.length > 2,
 			    escape;
-			if (checkbox.checked && /[\x20-\x26\x28-\x7E]/.test(character)) {
+			if (checkboxOnlyASCII.checked && /[\x20-\x26\x28-\x7E]/.test(character)) {
 				// it’s a printable ASCII character that is not `'`; don’t escape it
 				return character;
 			}
@@ -70,17 +72,24 @@
 
 	function update() {
 		var value = textarea.value.replace(/\\\n/g, ''); // LineContinuation
+		var result;
 		try {
-			text(
-				code,
-				'\'' + unicodeEscape(evil(
+			if (checkboxStringBody.checked) {
+				result = evil(
 					'"'
 					+ value.replace(/[\n\u2028\u2029"']/g, function(chr) {
 						return cache[chr];
 					})
 					.replace(/\\v/g, '\x0B') // In IE < 9, '\v' == 'v'; this normalizes the input
 					+ '"'
-				)) + '\''
+				);
+				result = unicodeEscape(result);
+			} else {
+				result = unicodeEscape(value.replace(/\\/g, '\\\\'));
+			}
+			text(
+				code,
+				'\'' + result + '\''
 			);
 			pre.className = '';
 		} catch (e) {
@@ -88,17 +97,22 @@
 		}
 		if (storage) {
 			storage.jsEscapeText = value;
-			if (checkbox.checked) {
-				storage.jsEscapeCheckbox = true;
+			if (checkboxOnlyASCII.checked) {
+				storage.jsEscapeOnlyASCII = true;
 			} else {
-				storage.removeItem('jsEscapeCheckbox');
+				storage.removeItem('jsEscapeOnlyASCII');
+			}
+			if (checkboxStringBody.checked) {
+				storage.jsEscapeStringBody = true;
+			} else {
+				storage.removeItem('jsEscapeStringBody');
 			}
 		}
-		permalink.hash = +checkbox.checked + encode(textarea.value);
+		permalink.hash = +checkboxOnlyASCII.checked + encode(textarea.value);
 	}
 
 	// http://mathiasbynens.be/notes/oninput
-	textarea.onkeyup = checkbox.onchange = update;
+	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxStringBody.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();
@@ -107,13 +121,14 @@
 
 	if (storage) {
 		storage.jsEscapeText && (textarea.value = storage.jsEscapeText);
-		storage.jsEscapeCheckbox && (checkbox.checked = true);
+		storage.jsEscapeOnlyASCII && (checkboxOnlyASCII.checked = true);
+		storage.jsEscapeStringBody && (checkboxStringBody.checked = true);
 		update();
 	}
 
 	window.onhashchange = function() {
 		var hash = location.hash;
-		hash.charAt(1) == '0' && (checkbox.checked = false);
+		hash.charAt(1) == '0' && (checkboxOnlyASCII.checked = false);
 		textarea.value = decodeURIComponent(hash.slice(2));
 		update();
 	};
