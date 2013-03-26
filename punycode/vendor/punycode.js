@@ -1,9 +1,4 @@
-/*!
- * Punycode.js <http://mths.be/punycode>
- * Copyright 2011 Mathias Bynens <http://mathiasbynens.be/>
- * Available under MIT license <http://mths.be/mit>
- */
-
+/*! http://mths.be/punycode v1.2.0 by @mathias */
 ;(function(root) {
 
 	/**
@@ -34,14 +29,13 @@
 	delimiter = '-', // '\x2D'
 
 	/** Regular expressions */
-	regexNonASCII = /[^ -~]/, // unprintable ASCII chars + non-ASCII chars
 	regexPunycode = /^xn--/,
+	regexNonASCII = /[^ -~]/, // unprintable ASCII chars + non-ASCII chars
+	regexSeparators = /\x2E|\u3002|\uFF0E|\uFF61/g, // RFC 3490 separators
 
 	/** Error messages */
 	errors = {
-		'overflow': 'Overflow: input needs wider integers to process.',
-		'ucs2decode': 'UCS-2(decode): illegal sequence',
-		'ucs2encode': 'UCS-2(encode): illegal value',
+		'overflow': 'Overflow: input needs wider integers to process',
 		'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
 		'invalid-input': 'Invalid input'
 	},
@@ -92,8 +86,7 @@
 	 * function.
 	 */
 	function mapDomain(string, fn) {
-		var glue = '.';
-		return map(string.split(glue), fn).join(glue);
+		return map(string.split(regexSeparators), fn).join('.');
 	}
 
 	/**
@@ -117,14 +110,17 @@
 		    extra;
 		while (counter < length) {
 			value = string.charCodeAt(counter++);
-			if ((value & 0xF800) == 0xD800) {
+			if ((value & 0xF800) == 0xD800 && counter < length) {
+				// high surrogate, and there is a next character
 				extra = string.charCodeAt(counter++);
-				if ((value & 0xFC00) != 0xD800 || (extra & 0xFC00) != 0xDC00) {
-					error('ucs2decode');
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					output.push(value, extra);
 				}
-				value = ((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
+			} else {
+				output.push(value);
 			}
-			output.push(value);
 		}
 		return output;
 	}
@@ -140,9 +136,6 @@
 	function ucs2encode(array) {
 		return map(array, function(value) {
 			var output = '';
-			if ((value & 0xF800) == 0xD800) {
-				error('ucs2encode');
-			}
 			if (value > 0xFFFF) {
 				value -= 0x10000;
 				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
@@ -205,7 +198,7 @@
 	}
 
 	/**
-	 * Converts a basic code point to lowercase is `flag` is falsy, or to
+	 * Converts a basic code point to lowercase if `flag` is falsy, or to
 	 * uppercase if `flag` is truthy. The code point is unchanged if it's
 	 * caseless. The behavior is undefined if `codePoint` is not a basic code
 	 * point.
@@ -285,7 +278,7 @@
 				}
 
 				i += digit * w;
-				t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+				t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
 
 				if (digit < t) {
 					break;
@@ -408,7 +401,7 @@
 				if (currentValue == n) {
 					// Represent delta as a generalized variable-length integer
 					for (q = delta, k = base; /* no condition */; k += base) {
-						t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+						t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
 						if (q < t) {
 							break;
 						}
@@ -477,7 +470,7 @@
 		 * @memberOf punycode
 		 * @type String
 		 */
-		'version': '1.0.0',
+		'version': '1.2.0',
 		/**
 		 * An object of methods to convert from JavaScript's internal character
 		 * representation (UCS-2) to decimal Unicode code points, and back.
