@@ -13,7 +13,7 @@
 }(this, 'luaparse', function (exports) {
   'use strict';
 
-  exports.version = '0.0.9';
+  exports.version = '0.0.11';
 
   var input, options, length;
 
@@ -785,7 +785,7 @@
       case 'n': index++; return '\n';
       case 'r': index++; return '\r';
       case 't': index++; return '\t';
-      case 'v': index++; return '\v';
+      case 'v': index++; return '\x0B';
       case 'b': index++; return '\b';
       case 'f': index++; return '\f';
       // Skips the following span of white-space.
@@ -830,10 +830,7 @@
       content = readLongString();
       // This wasn't a multiline comment after all.
       if (false === content) content = character;
-      else {
-        isLong = true;
-        index += 2; // Trailing --
-      }
+      else isLong = true;
     }
     // Scan until next line as long as it's not a multiline comment.
     if (!isLong) {
@@ -901,11 +898,6 @@
 
       // We reached the end of the multiline string. Get out now.
       if (terminator) break;
-
-      if ('\\' === character) {
-        content += input.slice(stringStart, index - 1) + readEscapeSequence();
-        stringStart = index;
-      }
     }
     content += input.slice(stringStart, index - 1);
     index += level + 1;

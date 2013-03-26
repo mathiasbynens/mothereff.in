@@ -21,11 +21,12 @@
 	var parse = luaparse.parse;
 
 	var regexAlphaUnderscore = /[a-zA-Z_]/;
+	var regexAlphaNumUnderscore = /[a-zA-Z0-9_]/;
 	var regexDigits = /[0-9]/;
 
+	// http://www.lua.org/manual/5.2/manual.html#3.4.7
+	// http://www.lua.org/source/5.2/lparser.c.html#priority
 	var PRECEDENCE = {
-		// http://www.lua.org/manual/5.2/manual.html#3.4.7
-		// http://www.lua.org/source/5.2/lparser.c.html#priority
 		'or': 1,
 		'and': 2,
 		'<': 3, '>': 3, '<=': 3, '>=': 3, '~=': 3, '==': 3,
@@ -56,11 +57,10 @@
 		var index = -1;
 		var length = array.length;
 		while (++index < length) {
-			if (array[index] === value) {
+			if (array[index] == value) {
 				return index;
 			}
 		}
-		//return -1; // not needed in this case!
 	}
 
 	var generateZeroes = function(length) {
@@ -83,10 +83,32 @@
 		return result;
 	};
 
+	// http://www.lua.org/manual/5.2/manual.html#3.1
+	function isKeyword(id) {
+		switch (id.length) {
+			case 2:
+				return 'do' == id || 'if' == id || 'in' == id || 'or' == id;
+			case 3:
+				return 'and' == id || 'end' == id || 'for' == id || 'nil' == id ||
+					'not' == id;
+			case 4:
+				return 'else' == id || 'goto' == id || 'then' == id || 'true' == id;
+			case 5:
+				return 'break' == id || 'false' == id || 'local' == id ||
+					'until' == id || 'while' == id;
+			case 6:
+				return 'elseif' == id || 'repeat' == id || 'return' == id;
+			case 8:
+				return 'function' == id;
+		}
+		return false;
+	}
+
 	var currentIdentifier;
 	var identifierMap;
 	var hasOwnProperty = {}.hasOwnProperty;
 	var generateIdentifier = function(originalName) {
+		var log = false;
 		if (hasOwnProperty.call(identifierMap, originalName)) {
 			return identifierMap[originalName];
 		}
@@ -100,8 +122,12 @@
 			if (index != IDENTIFIER_PARTS_MAX) {
 				currentIdentifier = currentIdentifier.substring(0, position) +
 					IDENTIFIER_PARTS[index + 1] + generateZeroes(length - (position + 1));
+				if (isKeyword(currentIdentifier)) {
+					return generateIdentifier(originalName);
+				} else {
 					identifierMap[originalName] = currentIdentifier;
-				return currentIdentifier;
+					return currentIdentifier;
+				}
 			}
 			--position;
 		}
@@ -116,32 +142,42 @@
 		separator || (separator = ' ');
 
 		var lastCharA = a.slice(-1);
-		var firstCharB = b.slice(0, 1);
+		var firstCharB = b.charAt(0);
 
-		if (regexAlphaUnderscore.test(lastCharA)) {
-			if (!(regexAlphaUnderscore.test(firstCharB) || regexDigits.test(firstCharB))) {
-				// `firstCharB` is a symbol; it's safe to join without a separator
-				return a + b;
-			} else {
-				// prevent ambiguous syntax
-				return a + separator + b;
-			}
-		} else if (regexDigits.test(lastCharA)) {
-			if (firstCharB == '(' || (firstCharB != '.' && !regexAlphaUnderscore.test(firstCharB))) {
-				// e.g. `1(` or `1-`
-				return a + b;
-			} else {
-				return a + separator + b;
-			}
-		} else if (lastCharA == '') {
-			return a + b;
-		} else if (!regexAlphaUnderscore.test(lastCharA) && (firstCharB == '(' || regexDigits.test(firstCharB))) {
-			return a + b;
-		} else if (firstCharB == '(' || (lastCharA == firstCharB && lastCharA == '-')) {
-			return a + separator + b;
-		} else {
+		if (lastCharA == '' || firstCharB == '') {
 			return a + b;
 		}
+		if (regexAlphaUnderscore.test(lastCharA)) {
+			if (regexAlphaNumUnderscore.test(firstCharB)) {
+				// e.g. `while` + `1`
+				// e.g. `local a` + `local b`
+				return a + separator + b;
+			} else {
+				// e.g. `not` + `(2>3 or 3<2)`
+				// e.g. `x` + `^`
+				return a + b;
+			}
+		}
+		if (regexDigits.test(lastCharA)) {
+			if (
+				firstCharB == '(' ||
+				!(firstCharB == '.' ||
+				regexAlphaUnderscore.test(firstCharB))
+			) {
+				// e.g. `1` + `+`
+				// e.g. `1` + `==`
+				return a + b;
+			} else {
+				// e.g. `1` + `..`
+				// e.g. `1` + `and`
+				return a + separator + b;
+			}
+		}
+		if (lastCharA == firstCharB && lastCharA == '-') {
+			// e.g. `1-` + `-2`
+			return a + separator + b;
+		}
+		return a + b;
 	};
 
 	var formatExpression = function(expression, precedence) {
@@ -156,7 +192,9 @@
 
 		if (expressionType == 'Identifier') {
 
-			result = expression.isLocal ? generateIdentifier(expression.name) : expression.name;
+			result = expression.isLocal
+				? generateIdentifier(expression.name)
+				: expression.name;
 
 		} else if (
 			expressionType == 'StringLiteral' ||
@@ -196,7 +234,10 @@
 			operator = expression.operator;
 			currentPrecedence = PRECEDENCE['unary' + operator];
 
-			result = joinStatements(operator, formatExpression(expression.argument, currentPrecedence));
+			result = joinStatements(
+				operator,
+				formatExpression(expression.argument, currentPrecedence)
+			);
 
 			if (currentPrecedence < precedence) {
 				result = '(' + result + ')';
@@ -213,21 +254,25 @@
 			});
 			result += ')';
 
-		} else if (expressionType == 'TableCallExpression') { // e.g. `foo{1,2,3}`
+		} else if (expressionType == 'TableCallExpression') {
 
-			result = formatExpression(expression.base) + formatExpression(expression.arguments);
+			result = formatExpression(expression.base) +
+				formatExpression(expression.arguments);
 
-		} else if (expressionType == 'StringCallExpression') { // e.g. `foo'lol'`
+		} else if (expressionType == 'StringCallExpression') {
 
-			result = formatExpression(expression.base) + formatExpression(expression.argument);
+			result = formatExpression(expression.base) +
+				formatExpression(expression.argument);
 
-		} else if (expressionType == 'IndexExpression') { // e.g. `x[2]`
+		} else if (expressionType == 'IndexExpression') {
 
-			result = formatExpression(expression.base) + '[' + formatExpression(expression.index) + ']';
+			result = formatExpression(expression.base) + '[' +
+				formatExpression(expression.index) + ']';
 
-		} else if (expressionType == 'MemberExpression') { // e.g. `x.sub(1, 1)` or `x:sub(1, 1)`
+		} else if (expressionType == 'MemberExpression') {
 
-			result = formatExpression(expression.base) + expression.indexer + formatExpression(expression.identifier);
+			result = formatExpression(expression.base) + expression.indexer +
+				formatExpression(expression.identifier);
 
 		} else if (expressionType == 'FunctionDeclaration') {
 
@@ -251,11 +296,13 @@
 
 			each(expression.fields, function(field, needsComma) {
 				if (field.type == 'TableKey') {
-					result += '[' + formatExpression(field.key) + ']=' + formatExpression(field.value);
+					result += '[' + formatExpression(field.key) + ']=' +
+						formatExpression(field.value);
 				} else if (field.type == 'TableValue') {
 					result += formatExpression(field.value);
-				} else if (field.type == 'TableKeyString') {
-					result += formatExpression(field.key) + '=' + formatExpression(field.value);
+				} else { // at this point, `field.type == 'TableKeyString'`
+					result += formatExpression(field.key) + '=' +
+						formatExpression(field.value);
 				}
 				if (needsComma) {
 					result += ',';
@@ -266,7 +313,7 @@
 
 		} else {
 
-			throw Error('Unknown expression type: ' + expressionType);
+			throw TypeError('Unknown expression type: `' + expressionType + '`');
 
 		}
 
@@ -334,9 +381,15 @@
 
 		} else if (statementType == 'IfStatement') {
 
-			result = joinStatements('if', formatExpression(statement.clauses[0].condition));
+			result = joinStatements(
+				'if',
+				formatExpression(statement.clauses[0].condition)
+			);
 			result = joinStatements(result, 'then');
-			result = joinStatements(result, formatStatementList(statement.clauses[0].body));
+			result = joinStatements(
+				result,
+				formatStatementList(statement.clauses[0].body)
+			);
 			each(statement.clauses.slice(1), function(clause) {
 				if (clause.condition) {
 					result = joinStatements(result, 'elseif');
@@ -402,7 +455,8 @@
 			result = joinStatements(result, formatStatementList(statement.body));
 			result = joinStatements(result, 'end');
 
-		} else if (statementType == 'ForGenericStatement') { // see also `ForNumericStatement`
+		} else if (statementType == 'ForGenericStatement') {
+			// see also `ForNumericStatement`
 
 			result = 'for ';
 
@@ -431,7 +485,8 @@
 
 			// The variables in a `ForNumericStatement` are always local
 			result = 'for ' + generateIdentifier(statement.variable.name) + '=';
-			result += formatExpression(statement.start) + ',' + formatExpression(statement.end);
+			result += formatExpression(statement.start) + ',' +
+				formatExpression(statement.end);
 
 			if (statement.step) {
 				result += ',' + formatExpression(statement.step);
@@ -443,25 +498,29 @@
 
 		} else if (statementType == 'LabelStatement') {
 
-			// The identifier names in a `LabelStatement` can always safely be renamed
+			// The identifier names in a `LabelStatement` can safely be renamed
 			result = '::' + generateIdentifier(statement.label.name) + '::';
 
 		} else if (statementType == 'GotoStatement') {
 
-			// The identifier names in a `GotoStatement` can always safely be renamed
+			// The identifier names in a `GotoStatement` can safely be renamed
 			result = 'goto ' + generateIdentifier(statement.label.name);
 
 		} else {
 
-			throw Error('Unknown AST type: ' + statementType);
+			throw TypeError('Unknown statement type: `' + statementType + '`');
 
 		}
 
 		return result;
 	};
 
-	var minify = function(code) {
-		var ast = parse(code);
+	var minify = function(argument) {
+		// `argument` can be a Lua code snippet (string)
+		// or a luaparse-compatible AST (object)
+		var ast = typeof argument == 'string'
+			? parse(argument)
+			: argument;
 
 		// (Re)set temporary identifier values
 		identifierMap = {};
@@ -469,9 +528,13 @@
 		currentIdentifier = '9';
 
 		// Make sure global variable names aren't renamed
-		each(ast.globals, function(name) {
-			identifierMap[name] = name;
-		});
+		if (ast.globals) {
+			each(ast.globals, function(name) {
+				identifierMap[name] = name;
+			});
+		} else {
+			throw Error('Missing required AST property: `globals`');
+		}
 
 		return formatStatementList(ast.body);
 	};
@@ -479,18 +542,21 @@
 	/*--------------------------------------------------------------------------*/
 
 	var luamin = {
-		'version': '0.1.1',
+		'version': '0.2.2',
 		'minify': minify
 	};
 
-	// Some AMD build optimizers, like r.js, check for specific condition patterns like the following:
-	if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
 		define(function() {
 			return luamin;
 		});
-	}
-	// Check for `exports` after `define` in case a build optimizer adds an `exports` object
-	else if (freeExports && !freeExports.nodeType) {
+	}	else if (freeExports && !freeExports.nodeType) {
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = luamin;
 		} else { // in Narwhal or RingoJS v0.7.0-
