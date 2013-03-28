@@ -928,16 +928,6 @@
     return false;
   }
 
-  // Check if the given expression exists and raise an exception if not.
-  //
-  // As expressions can return null due to the design of the parser, we often
-  // need this strict expression check as well.
-
-  function expectExpression(expression) {
-    if (null == expression) raiseUnexpectedToken('<expression>', token);
-    else return expression;
-  }
-
   // Expect the next token value to match. If not, throw an exception.
 
   function expect(value) {
@@ -1203,7 +1193,7 @@
   //     while ::= 'while' exp 'do' block 'end'
 
   function parseWhileStatement() {
-    var condition = parseExpression();
+    var condition = parseExpectedExpression();
     expect('do');
     var body = parseBlock();
     expect('end');
@@ -1215,7 +1205,7 @@
   function parseRepeatStatement() {
     var body = parseBlock();
     expect('until');
-    var condition = expectExpression(parseExpression());
+    var condition = parseExpectedExpression();
     return ast.repeatStatement(condition, body);
   }
 
@@ -1228,7 +1218,7 @@
       var expression = parseExpression();
       if (null != expression) expressions.push(expression);
       while (consume(',')) {
-        expression = expectExpression(parseExpression());
+        expression = parseExpectedExpression();
         expressions.push(expression);
       }
       consume(';'); // grammar tells us ; is optional here.
@@ -1244,13 +1234,13 @@
       , condition
       , body;
 
-    condition = parseExpression();
+    condition = parseExpectedExpression();
     expect('then');
     body = parseBlock();
     clauses.push(ast.ifClause(condition, body));
 
     while (consume('elseif')) {
-      condition = parseExpression();
+      condition = parseExpectedExpression();
       expect('then');
       body = parseBlock();
       clauses.push(ast.elseifClause(condition, body));
@@ -1283,12 +1273,12 @@
     // Numeric For Statement.
     if (consume('=')) {
       // Start expression
-      var start = expectExpression(parseExpression());
+      var start = parseExpectedExpression();
       expect(',');
       // End expression
-      var end = expectExpression(parseExpression());
+      var end = parseExpectedExpression();
       // Optional step expression
-      var step = consume(',') ? expectExpression(parseExpression()) : null;
+      var step = consume(',') ? parseExpectedExpression() : null;
 
       expect('do');
       body = parseBlock();
@@ -1311,7 +1301,7 @@
 
       // One or more expressions in the explist.
       do {
-        var expression = expectExpression(parseExpression());
+        var expression = parseExpectedExpression();
         iterators.push(expression);
       } while (consume(','));
 
@@ -1348,7 +1338,7 @@
 
       if (consume('=')) {
         do {
-          var expression = expectExpression(parseExpression());
+          var expression = parseExpectedExpression();
           init.push(expression);
         } while (consume(','));
       }
@@ -1395,12 +1385,13 @@
         , exp;
 
       while (consume(',')) {
-        exp = expectExpression(parsePrefixExpression());
+        exp = parsePrefixExpression();
+        if (null == exp) raiseUnexpectedToken('<expression>', token);
         variables.push(exp);
       }
       expect('=');
       do {
-        exp = expectExpression(parseExpression());
+        exp = parseExpectedExpression();
         init.push(exp);
       } while (consume(','));
       return ast.assignmentStatement(variables, init);
@@ -1509,15 +1500,15 @@
 
     while (true) {
       if (Punctuator === token.type && consume('[')) {
-        key = parseExpression();
+        key = parseExpectedExpression();
         expect(']');
         expect('=');
-        value = expectExpression(parseExpression());
+        value = parseExpectedExpression();
         fields.push(ast.tableKey(key, value));
       } else if (Identifier === token.type) {
-        key = parseExpression();
+        key = parseExpectedExpression();
         if (consume('=')) {
-          value = parseExpression();
+          value = parseExpectedExpression();
           fields.push(ast.tableKeyString(key, value));
         } else {
           fields.push(ast.tableValue(key));
@@ -1539,7 +1530,8 @@
   // Expression parser
   // -----------------
   //
-  // Expressions are evaluated and always return a value.
+  // Expressions are evaluated and always return a value. If nothing is
+  // matched null will be returned.
   //
   //     exp ::= (unop exp | primary | prefixexp ) { binop exp }
   //
@@ -1554,6 +1546,15 @@
     var expression = parseSubExpression(0);
     return expression;
   }
+
+  // Parse an expression expecting it to be valid.
+
+  function parseExpectedExpression() {
+    var expression = parseExpression();
+    if (null == expression) raiseUnexpectedToken('<expression>', token);
+    else return expression;
+  }
+
 
   // Return the precedence priority of the operator.
   //
@@ -1601,7 +1602,8 @@
     // UnaryExpression
     if (isUnary(token)) {
       next();
-      var argument = expectExpression(parseSubExpression(8));
+      var argument = parseSubExpression(8);
+      if (argument == null) raiseUnexpectedToken('<expression>', token);
       expression = ast.unaryExpression(operator, argument);
     }
     if (null == expression) {
@@ -1627,7 +1629,8 @@
       // Right-hand precedence operators
       if ('^' === operator || '..' === operator) precedence--;
       next();
-      var right = expectExpression(parseSubExpression(precedence));
+      var right = parseSubExpression(precedence);
+      if (null == right) raiseUnexpectedToken('<expression>', token);
       expression = ast.binaryExpression(operator, expression, right);
     }
     return expression;
@@ -1651,7 +1654,7 @@
       // Set the parent scope.
       if (options.scope) attachScope(base, isLocal = scopeHasName(name));
     } else if (consume('(')) {
-      base = expectExpression(parseExpression());
+      base = parseExpectedExpression();
       expect(')');
       if (options.scope) isLocal = base.isLocal;
     } else {
@@ -1661,12 +1664,11 @@
     // The suffix
     var expression, identifier;
     while (true) {
-      expectExpression(base);
       if (Punctuator === token.type) {
         switch (token.value) {
           case '[':
             next();
-            expression = parseExpression();
+            expression = parseExpectedExpression();
             base = ast.indexExpression(base, expression);
             expect(']');
             break;
@@ -1715,7 +1717,7 @@
           var expression = parseExpression();
           if (null != expression) expressions.push(expression);
           while (consume(',')) {
-            expression = expectExpression(parseExpression());
+            expression = parseExpectedExpression();
             expressions.push(expression);
           }
 

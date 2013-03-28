@@ -44,16 +44,16 @@
 		'U', 'V', 'W', 'X', 'Y', 'Z', '_'];
 	var IDENTIFIER_PARTS_MAX = IDENTIFIER_PARTS.length - 1;
 
-	function each(array, fn) {
+	var each = function(array, fn) {
 		var index = -1;
 		var length = array.length;
 		var max = length - 1;
 		while (++index < length) {
 			fn(array[index], index < max);
 		}
-	}
+	};
 
-	function indexOf(array, value) {
+	var indexOf = function(array, value) {
 		var index = -1;
 		var length = array.length;
 		while (++index < length) {
@@ -61,7 +61,18 @@
 				return index;
 			}
 		}
-	}
+	};
+
+	var extend = function(source, destination) {
+		if (source) {
+			for (var key in source) {
+				if (source.hasOwnProperty(key)) {
+					destination[key] = source[key];
+				}
+			}
+		}
+		return destination;
+	};
 
 	var generateZeroes = function(length) {
 		var zero = '0';
@@ -108,7 +119,6 @@
 	var identifierMap;
 	var hasOwnProperty = {}.hasOwnProperty;
 	var generateIdentifier = function(originalName) {
-		var log = false;
 		if (hasOwnProperty.call(identifierMap, originalName)) {
 			return identifierMap[originalName];
 		}
@@ -180,9 +190,12 @@
 		return a + b;
 	};
 
-	var formatExpression = function(expression, precedence) {
+	var formatExpression = function(expression, options) {
 
-		precedence || (precedence = 0);
+		options = extend(options, {
+			'precedence': 0,
+			'preserveIdentifiers': false
+		});
 
 		var result = '';
 		var currentPrecedence;
@@ -192,7 +205,7 @@
 
 		if (expressionType == 'Identifier') {
 
-			result = expression.isLocal
+			result = expression.isLocal && !options.preserveIdentifiers
 				? generateIdentifier(expression.name)
 				: expression.name;
 
@@ -217,7 +230,9 @@
 			operator = expression.operator;
 			currentPrecedence = PRECEDENCE[operator];
 
-			result = formatExpression(expression.left, currentPrecedence);
+			result = formatExpression(expression.left, {
+				'precedence': currentPrecedence
+			});
 			result = joinStatements(result, operator);
 			result = joinStatements(result, formatExpression(expression.right));
 
@@ -225,7 +240,7 @@
 				currentPrecedence--;
 			}
 
-			if (currentPrecedence < precedence) {
+			if (currentPrecedence < options.precedence) {
 				result = '(' + result + ')';
 			}
 
@@ -236,10 +251,12 @@
 
 			result = joinStatements(
 				operator,
-				formatExpression(expression.argument, currentPrecedence)
+				formatExpression(expression.argument, {
+					'precedence': currentPrecedence
+				})
 			);
 
-			if (currentPrecedence < precedence) {
+			if (currentPrecedence < options.precedence) {
 				result = '(' + result + ')';
 			}
 
@@ -272,7 +289,9 @@
 		} else if (expressionType == 'MemberExpression') {
 
 			result = formatExpression(expression.base) + expression.indexer +
-				formatExpression(expression.identifier);
+				formatExpression(expression.identifier, {
+					'preserveIdentifiers': true
+				});
 
 		} else if (expressionType == 'FunctionDeclaration') {
 
@@ -542,7 +561,7 @@
 	/*--------------------------------------------------------------------------*/
 
 	var luamin = {
-		'version': '0.2.2',
+		'version': '0.2.3',
 		'minify': minify
 	};
 
