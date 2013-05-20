@@ -1,5 +1,14 @@
-/*! http://mths.be/punycode v1.2.0 by @mathias */
+/*! http://mths.be/punycode v1.2.1 by @mathias */
 ;(function(root) {
+
+	/** Detect free variables */
+	var freeExports = typeof exports == 'object' && exports;
+	var freeModule = typeof module == 'object' && module &&
+		module.exports == freeExports && module;
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
 
 	/**
 	 * The `punycode` object.
@@ -7,13 +16,6 @@
 	 * @type Object
 	 */
 	var punycode,
-
-	/** Detect free variables `define`, `exports`, `module` and `require` */
-	freeDefine = typeof define == 'function' && typeof define.amd == 'object' &&
-		define.amd && define,
-	freeExports = typeof exports == 'object' && exports,
-	freeModule = typeof module == 'object' && module,
-	freeRequire = typeof require == 'function' && require,
 
 	/** Highest positive signed 32-bit float value */
 	maxInt = 2147483647, // aka. 0x7FFFFFFF or 2^31-1
@@ -195,20 +197,6 @@
 			delta = floor(delta / baseMinusTMin);
 		}
 		return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
-	}
-
-	/**
-	 * Converts a basic code point to lowercase if `flag` is falsy, or to
-	 * uppercase if `flag` is truthy. The code point is unchanged if it's
-	 * caseless. The behavior is undefined if `codePoint` is not a basic code
-	 * point.
-	 * @private
-	 * @param {Number} codePoint The numeric value of a basic code point.
-	 * @returns {Number} The resulting basic code point.
-	 */
-	function encodeBasic(codePoint, flag) {
-		codePoint -= (codePoint - 97 < 26) << 5;
-		return codePoint + (!flag && codePoint - 65 < 26) << 5;
 	}
 
 	/**
@@ -470,7 +458,7 @@
 		 * @memberOf punycode
 		 * @type String
 		 */
-		'version': '1.2.0',
+		'version': '1.2.1',
 		/**
 		 * An object of methods to convert from JavaScript's internal character
 		 * representation (UCS-2) to decimal Unicode code points, and back.
@@ -489,21 +477,25 @@
 	};
 
 	/** Expose `punycode` */
-	if (freeExports) {
-		if (freeModule && freeModule.exports == freeExports) {
-			// in Node.js or Ringo 0.8+
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define(function() {
+			return punycode;
+		});
+	}	else if (freeExports && !freeExports.nodeType) {
+		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = punycode;
-		} else {
-			// in Narwhal or Ringo 0.7-
+		} else { // in Narwhal or RingoJS v0.7.0-
 			for (key in punycode) {
 				punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
 			}
 		}
-	} else if (freeDefine) {
-		// via curl.js or RequireJS
-		define('punycode', punycode);
-	} else {
-		// in a browser or Rhino
+	} else { // in Rhino or a web browser
 		root.punycode = punycode;
 	}
 
