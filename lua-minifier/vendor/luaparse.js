@@ -324,7 +324,6 @@
   function sprintf(format) {
     var args = slice.call(arguments, 1);
     format = format.replace(/%(\d)/g, function (match, index) {
-      match = ''; // jshint
       return '' + args[index - 1] || '';
     });
     return format;

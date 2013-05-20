@@ -1,4 +1,5 @@
-(function(root) {
+/*! http://mths.be/luamin v0.2.5 by @mathias */
+;(function(root) {
 
 	// Detect free variables `exports`
 	var freeExports = typeof exports == 'object' && exports;
@@ -7,9 +8,10 @@
 	var freeModule = typeof module == 'object' && module &&
 		module.exports == freeExports && module;
 
-	// Detect free variable `global` and use it as `root`
+	// Detect free variable `global`, from Node.js or Browserified code,
+	// and use it as `root`
 	var freeGlobal = typeof global == 'object' && global;
-	if (freeGlobal.global === freeGlobal) {
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
 		root = freeGlobal;
 	}
 
@@ -63,10 +65,12 @@
 		}
 	};
 
-	var extend = function(source, destination) {
+	var hasOwnProperty = {}.hasOwnProperty;
+	var extend = function(destination, source) {
+		var key;
 		if (source) {
-			for (var key in source) {
-				if (source.hasOwnProperty(key)) {
+			for (key in source) {
+				if (hasOwnProperty.call(source, key)) {
 					destination[key] = source[key];
 				}
 			}
@@ -117,7 +121,7 @@
 
 	var currentIdentifier;
 	var identifierMap;
-	var hasOwnProperty = {}.hasOwnProperty;
+	var identifiersInUse;
 	var generateIdentifier = function(originalName) {
 		if (hasOwnProperty.call(identifierMap, originalName)) {
 			return identifierMap[originalName];
@@ -132,16 +136,21 @@
 			if (index != IDENTIFIER_PARTS_MAX) {
 				currentIdentifier = currentIdentifier.substring(0, position) +
 					IDENTIFIER_PARTS[index + 1] + generateZeroes(length - (position + 1));
-				if (isKeyword(currentIdentifier)) {
+				if (
+					isKeyword(currentIdentifier) ||
+					indexOf(identifiersInUse, currentIdentifier) > -1
+				) {
 					return generateIdentifier(originalName);
-				} else {
-					identifierMap[originalName] = currentIdentifier;
-					return currentIdentifier;
 				}
+				identifierMap[originalName] = currentIdentifier;
+				return currentIdentifier;
 			}
 			--position;
 		}
 		currentIdentifier = 'a' + generateZeroes(length);
+		if (indexOf(identifiersInUse, currentIdentifier) > -1) {
+			return generateIdentifier(originalName);
+		}
 		identifierMap[originalName] = currentIdentifier;
 		return currentIdentifier;
 	};
@@ -192,10 +201,10 @@
 
 	var formatExpression = function(expression, options) {
 
-		options = extend(options, {
+		options = extend({
 			'precedence': 0,
 			'preserveIdentifiers': false
-		});
+		}, options);
 
 		var result = '';
 		var currentPrecedence;
@@ -299,7 +308,9 @@
 			if (expression.parameters.length) {
 				each(expression.parameters, function(parameter, needsComma) {
 					// `Identifier`s have a `name`, `VarargLiteral`s have a `value`
-					result += parameter.name || parameter.value;
+					result += parameter.name
+						? generateIdentifier(parameter.name)
+						: parameter.value;
 					if (needsComma) {
 						result += ',';
 					}
@@ -463,7 +474,9 @@
 			if (statement.parameters.length) {
 				each(statement.parameters, function(parameter, needsComma) {
 					// `Identifier`s have a `name`, `VarargLiteral`s have a `value`
-					result += parameter.name || parameter.value;
+					result += parameter.name
+						? generateIdentifier(parameter.name)
+						: parameter.value;
 					if (needsComma) {
 						result += ',';
 					}
@@ -543,13 +556,16 @@
 
 		// (Re)set temporary identifier values
 		identifierMap = {};
+		identifiersInUse = [];
 		// This is a shortcut to help generate the first identifier (`a`) faster
 		currentIdentifier = '9';
 
 		// Make sure global variable names aren't renamed
 		if (ast.globals) {
-			each(ast.globals, function(name) {
+			each(ast.globals, function(object) {
+				var name = object.name;
 				identifierMap[name] = name;
+				identifiersInUse.push(name);
 			});
 		} else {
 			throw Error('Missing required AST property: `globals`');
@@ -561,7 +577,7 @@
 	/*--------------------------------------------------------------------------*/
 
 	var luamin = {
-		'version': '0.2.3',
+		'version': '0.2.5',
 		'minify': minify
 	};
 
@@ -579,9 +595,7 @@
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = luamin;
 		} else { // in Narwhal or RingoJS v0.7.0-
-			for (var key in luamin) {
-				luamin.hasOwnProperty(key) && (freeExports[key] = luamin[key]);
-			}
+			extend(freeExports, luamin);
 		}
 	} else { // in Rhino or a web browser
 		root.luamin = luamin;
