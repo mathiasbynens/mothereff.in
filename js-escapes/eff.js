@@ -87,6 +87,8 @@
 			} else {
 				result = unicodeEscape(value.replace(/\\/g, '\\\\'));
 			}
+			// use `\0` instead of `\x00` where possible
+			result = result.replace(/\\x00([^01234567]|$)/g, '\\0$1');
 			text(
 				code,
 				'\'' + result + '\''
