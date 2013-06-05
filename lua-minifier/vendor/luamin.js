@@ -1,4 +1,4 @@
-/*! http://mths.be/luamin v0.2.5 by @mathias */
+/*! http://mths.be/luamin v0.2.6 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -577,7 +577,7 @@
 	/*--------------------------------------------------------------------------*/
 
 	var luamin = {
-		'version': '0.2.5',
+		'version': '0.2.6',
 		'minify': minify
 	};
 
