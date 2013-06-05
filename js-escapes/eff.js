@@ -20,19 +20,10 @@
 	    	} catch(e) {}
 	    }()),
 	    cache = {
-	    	// http://es5.github.com/#x7.8.4
-	    	// Table 4 — String Single Character Escape Sequences
-	    	'\b': '\\b',
-	    	'\t': '\\t',
 	    	'\n': '\\n',
-	    	'\v': '\\x0B', // In IE < 9, '\v' == 'v'
-	    	'\f': '\\f',
-	    	'\r': '\\r',
-	    	// escape double quotes, \u2028, and \u2029 too, as they break input
 	    	'\"': '\\\"',
 	    	'\u2028': '\\u2028',
 	    	'\u2029': '\\u2029',
-	    	// we’re wrapping the string in single quotes, so escape those too
 	    	'\'': '\\\''
 	    };
 
@@ -51,25 +42,6 @@
 		el.textContent != null && (el.textContent = str);
 	}
 
-	// https://gist.github.com/1243213
-	function unicodeEscape(str) {
-		return str.replace(/[\s\S]/g, function(character) {
-			var charCode = character.charCodeAt(),
-			    hexadecimal = charCode.toString(16).toUpperCase(),
-			    longhand = hexadecimal.length > 2,
-			    escape;
-			if (checkboxOnlyASCII.checked && /[\x20-\x26\x28-\x7E]/.test(character)) {
-				// it’s a printable ASCII character that is not `'`; don’t escape it
-				return character;
-			}
-			if (cache[character]) {
-				return cache[character];
-			}
-			escape = cache[character] = '\\' + (longhand ? 'u' : 'x') + ('0000' + hexadecimal).slice(longhand ? -4 : -2);
-			return escape;
-		});
-	}
-
 	function update() {
 		var value = textarea.value.replace(/\\\n/g, ''); // LineContinuation
 		var result;
@@ -83,15 +55,17 @@
 					.replace(/\\v/g, '\x0B') // In IE < 9, '\v' == 'v'; this normalizes the input
 					+ '"'
 				);
-				result = unicodeEscape(result);
 			} else {
-				result = unicodeEscape(value.replace(/\\/g, '\\\\'));
+				result = value;
 			}
-			// use `\0` instead of `\x00` where possible
-			result = result.replace(/\\x00([^01234567]|$)/g, '\\0$1');
+			result = stringEscape(result, {
+				'quotes': 'single',
+				'wrap': true,
+				'escapeEverything': !checkboxOnlyASCII.checked
+			});
 			text(
 				code,
-				'\'' + result + '\''
+				result
 			);
 			pre.className = '';
 		} catch (e) {
@@ -138,7 +112,6 @@
 	if (location.hash) {
 		window.onhashchange();
 	}
-
 
 }(this, document, eval));
 
