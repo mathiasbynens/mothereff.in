@@ -1,4 +1,4 @@
-/*! http://mths.be/stringescape v0.1.4 by @mathias */
+/*! http://mths.be/stringescape v0.1.5 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -53,10 +53,11 @@
 	};
 
 	var regexAnyCodeUnit = /[\s\S]/g;
-	var regexNull = /([^\\]|^)\\x00([^01234567]|$)/g;
+	var regexOctalDigit = /[0-7]/g;
 	var regexWhitelist = /[\x20\x21\x23-\x26\x28-\x5B\x5D-\x7E]/;
 
 	var stringEscape = function(string, options) {
+		// Handle options
 		var defaults = {
 			'escapeEverything': false,
 			'quotes': 'single',
@@ -67,41 +68,51 @@
 			options.quotes = 'single';
 		}
 		var quote = options.quotes == 'double' ? '"' : '\'';
-		var escaped = String(string).replace(regexAnyCodeUnit, function(character) {
-			var charCode = character.charCodeAt(0);
-			var hexadecimal = charCode.toString(16).toUpperCase();
-			var longhand = hexadecimal.length > 2;
-			var result;
+
+		// Loop over each code unit in the string and escape it
+		var index = -1;
+		var length = string.length;
+		var result = '';
+		while (++index < length) {
+			var character = string.charAt(index);
 			if (!options.escapeEverything) {
 				if (regexWhitelist.test(character)) {
 					// It’s a printable ASCII character that is not `"`, `'` or `\`,
 					// so don’t escape it.
-					return character;
+					result += character;
+					continue;
 				}
 				if (character == '"') {
-					return quote == character ? '\\"' : character;
+					result += quote == character ? '\\"' : character;
+					continue;
 				}
 				if (character == '\'') {
-					return quote == character ? '\\\'' : character;
+					result += quote == character ? '\\\'' : character;
+					continue;
 				}
 			}
-			if (hasKey(cache, character)) {
-				return cache[character];
+			if (character == '\0' && !regexOctalDigit.test(string.charAt(index + 1))) {
+				result += '\\0';
+				continue;
 			}
-			result = cache[character] = '\\' + (longhand ? 'u' : 'x') +
+			if (hasKey(cache, character)) {
+				result += cache[character];
+				continue;
+			}
+			var charCode = character.charCodeAt(0);
+			var hexadecimal = charCode.toString(16).toUpperCase();
+			var longhand = hexadecimal.length > 2;
+			result += cache[character] = '\\' + (longhand ? 'u' : 'x') +
 				('0000' + hexadecimal).slice(longhand ? -4 : -2);
-			return result;
-		});
-		// Use `\0` instead of `\x00` where possible
-		escaped = escaped.replace(regexNull, '$1\\0$2');
-		// Wrap output in quotes if needed
-		if (options.wrap) {
-			escaped = quote + escaped + quote;
+			continue;
 		}
-		return escaped;
+		if (options.wrap) {
+			result = quote + result + quote;
+		}
+		return result;
 	};
 
-	stringEscape.version = '0.1.4';
+	stringEscape.version = '0.1.5';
 
 	/*--------------------------------------------------------------------------*/
 
