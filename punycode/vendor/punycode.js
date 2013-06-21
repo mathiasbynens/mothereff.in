@@ -1,4 +1,4 @@
-/*! http://mths.be/punycode v1.2.2 by @mathias */
+/*! http://mths.be/punycode v1.2.3 by @mathias */
 ;(function(root) {
 
 	/** Detect free variables */
@@ -112,13 +112,16 @@
 		    extra;
 		while (counter < length) {
 			value = string.charCodeAt(counter++);
-			if ((value & 0xF800) == 0xD800 && counter < length) {
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
 				// high surrogate, and there is a next character
 				extra = string.charCodeAt(counter++);
 				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
 					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
 				} else {
-					output.push(value, extra);
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
 				}
 			} else {
 				output.push(value);
@@ -461,7 +464,7 @@
 		 * @memberOf punycode
 		 * @type String
 		 */
-		'version': '1.2.2',
+		'version': '1.2.3',
 		/**
 		 * An object of methods to convert from JavaScript's internal character
 		 * representation (UCS-2) to Unicode code points, and back.
