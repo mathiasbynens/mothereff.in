@@ -1,4 +1,4 @@
-/*! http://mths.be/stringescape v0.1.5 by @mathias */
+/*! http://mths.be/stringescape v0.1.6 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -52,8 +52,7 @@
 		'\'': '\\\''
 	};
 
-	var regexAnyCodeUnit = /[\s\S]/g;
-	var regexOctalDigit = /[0-7]/g;
+	var regexDigit = /[0-9]/;
 	var regexWhitelist = /[\x20\x21\x23-\x26\x28-\x5B\x5D-\x7E]/;
 
 	var stringEscape = function(string, options) {
@@ -91,7 +90,7 @@
 					continue;
 				}
 			}
-			if (character == '\0' && !regexOctalDigit.test(string.charAt(index + 1))) {
+			if (character == '\0' && !regexDigit.test(string.charAt(index + 1))) {
 				result += '\\0';
 				continue;
 			}
@@ -112,7 +111,7 @@
 		return result;
 	};
 
-	stringEscape.version = '0.1.5';
+	stringEscape.version = '0.1.6';
 
 	/*--------------------------------------------------------------------------*/
 
@@ -130,7 +129,7 @@
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = stringEscape;
 		} else { // in Narwhal or RingoJS v0.7.0-
-			extend(freeExports, stringEscape);
+			freeExports.stringEscape = stringEscape;
 		}
 	} else { // in Rhino or a web browser
 		root.stringEscape = stringEscape;
