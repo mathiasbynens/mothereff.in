@@ -27,14 +27,20 @@
 		    extra;
 		while (counter < length) {
 			value = string.charCodeAt(counter++);
-			if ((value & 0xF800) == 0xD800) {
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
 				extra = string.charCodeAt(counter++);
-				if ((value & 0xFC00) != 0xD800 || (extra & 0xFC00) != 0xDC00) {
-					throw Error('Illegal UCS-2 sequence');
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
 				}
-				value = ((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
+			} else {
+				output.push(value);
 			}
-			output.push(value);
 		}
 		return output;
 	}
@@ -53,7 +59,7 @@
 	function update() {
 		var value = textarea.value.replace(/\r\n/g, '\n'),
 		    encodedValue = encode(value),
-		    byteCount = ~-encodedValue.split(/%..|./).length, // https://gist.github.com/1010324
+		    byteCount = utf8.encode(value).length, // https://mths.be/utf8js
 		    characterCount = ucs2decode(value).length;
 		characters.innerHTML = formatNumber(characterCount, 'character');
 		bytes.innerHTML = formatNumber(byteCount, 'byte');
