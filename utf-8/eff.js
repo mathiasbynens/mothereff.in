@@ -4,10 +4,6 @@
 	    decoded = textareas[0],
 	    encoded = textareas[1],
 	    permalink = document.getElementById('permalink'),
-	    regexBinaryGroup = /\s*[01]{8}\s*/g,
-	    regexAnyCharacter = /[\s\S]/g,
-	    regexBinary = /^(\s*[01]{8}\s*)*$/,
-	    regexExtendedASCII = /^[\x00-\xff]*$/,
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
