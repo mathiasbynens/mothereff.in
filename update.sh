@@ -2,6 +2,7 @@
 
 echo "Updating dependencies..."
 ./byte-counter/vendor/update.sh
+./html-entities/vendor/update.sh
 ./js-escapes/vendor/update.sh
 ./lua-minifier/vendor/update.sh
 ./punycode/vendor/update.sh
