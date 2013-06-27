@@ -10,7 +10,8 @@
 <h2>Decoded:</h2>
 <textarea autofocus>Foo © bar 𝌆 baz ☃ qux</textarea>
 <h2>Encoded: (<a href=#Foo%20%C2%A9%20bar%20%F0%9D%8C%86%20baz%20%E2%98%83%20qux id=permalink>permalink</a>)</h2>
-<textarea>Foo &amp;copy; bar &amp;#x1D306; baz &amp;#x2603; qux</textarea>
+<textarea>Foo &amp;#xA9; bar &amp;#x1D306; baz &amp;#x2603; qux</textarea>
+<div><label><input type=checkbox> allow named character references in output (incompatible with older browsers)</label></div>
 <h2>About this tool</h2>
 <p>This tool uses <a href=http://mths.be/he><i>he</i></a> to HTML-encode any string you enter in the ‘decoded’ field, or to decode any HTML-encoded string you enter in the ‘encoded’ field.
 <p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/html-entities>fork this on GitHub!</a></p>
