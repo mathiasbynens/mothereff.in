@@ -35,7 +35,7 @@
 }(this, 'luaparse', function (exports) {
   'use strict';
 
-  exports.version = '0.1.2';
+  exports.version = '0.1.3';
 
   var input, options, length;
 
@@ -63,6 +63,12 @@
   var EOF = 1, StringLiteral = 2, Keyword = 4, Identifier = 8
     , NumericLiteral = 16, Punctuator = 32, BooleanLiteral = 64
     , NilLiteral = 128, VarargLiteral = 256;
+
+  exports.tokenTypes = { EOF: EOF, StringLiteral: StringLiteral
+    , Keyword: Keyword, Identifier: Identifier, NumericLiteral: NumericLiteral
+    , Punctuator: Punctuator, BooleanLiteral: BooleanLiteral
+    , NilLiteral: NilLiteral, VarargLiteral: VarargLiteral
+  };
 
   // As this parser is a bit different from luas own, the error messages
   // will be different in some situations.
@@ -336,6 +342,21 @@
     }
   };
 
+  // Wrap up the node object.
+
+  function finishNode(node) {
+    // Pop a `Marker` off the location-array and attach its location data.
+    if (trackLocations) {
+      var location = locations.pop();
+      location.complete();
+      if (options.locations) node.loc = location.loc;
+      if (options.ranges) node.range = location.range;
+    }
+    return node;
+  }
+
+
+
   // Helpers
   // -------
 
@@ -347,6 +368,16 @@
       }
       return -1;
     };
+
+  // Iterate through an array of objects and return the index of an object
+  // with a matching property.
+
+  function indexOfObject(array, property, element) {
+    for (var i = 0, length = array.length; i < length; i++) {
+      if (array[i][property] === element) return i;
+    }
+    return -1;
+  }
 
   // A sprintf implementation using %index (beginning at 1) to input
   // arguments in the format string.
@@ -376,7 +407,7 @@
       , dest = {}
       , src, prop;
 
-    for (var i = 0, l = args.length; i < l; i++) {
+    for (var i = 0, length = args.length; i < length; i++) {
       src = args[i];
       for (prop in src) if (src.hasOwnProperty(prop)) {
         dest[prop] = src[prop];
@@ -1074,11 +1105,7 @@
     // The current scope index
     , scopeDepth
     // A list of all global identifier nodes.
-    , globals
-    // A list of all global identifiers names used for faster lookup.
-    // @TODO benchmark, with exposing the globals this entire implementation
-    // should probably change.
-    , globalNames;
+    , globals;
 
   // Create a new scope inheriting all declarations from the previous scope.
   function createScope() {
@@ -1106,10 +1133,8 @@
   // Attach scope information to node. If the node is global, store it in the
   // globals array so we can return the information to the user.
   function attachScope(node, isLocal) {
-    if (!isLocal && -1 === indexOf(globalNames, node.name)) {
-      globalNames.push(node.name);
+    if (!isLocal && -1 === indexOfObject(globals, 'name', node.name))
       globals.push(node);
-    }
 
     node.isLocal = isLocal;
   }
@@ -1119,6 +1144,57 @@
     return (-1 !== indexOf(scopes[scopeDepth], name));
   }
 
+  // Location tracking
+  // -----------------
+  //
+  // Locations are stored in FILO-array as a `Marker` object consisting of both
+  // `loc` and `range` data. Once a `Marker` is popped off the list an end
+  // location is added and the data is attached to a syntax node.
+
+  var locations = []
+    , trackLocations;
+
+  function createLocationMarker() {
+    return new Marker(token);
+  }
+
+  function Marker(token) {
+    if (options.locations) {
+      this.loc = {
+          start: {
+            line: token.line
+          , column: token.range[0] - token.lineStart
+        }
+        , end: {
+            line: 0
+          , column: 0
+        }
+      };
+    }
+    if (options.ranges) this.range = [token.range[0], 0];
+  }
+
+  // Complete the location data stored in the `Marker` by adding the location
+  // of the *previous token* as an end location.
+  Marker.prototype.complete = function() {
+    if (options.locations) {
+      this.loc.end.line = previousToken.line;
+      this.loc.end.column = previousToken.range[1] - previousToken.lineStart;
+    }
+    if (options.ranges) {
+      this.range[1] = previousToken.range[1];
+    }
+  };
+
+  // Create a new `Marker` and add it to the FILO-array.
+  function markLocation() {
+    if (trackLocations) locations.push(createLocationMarker());
+  }
+
+  // Push an arbitrary `Marker` object onto the FILO-array.
+  function pushLocation(marker) {
+    if (trackLocations) locations.push(marker);
+  }
 
   // Parse functions
   // ---------------
@@ -1864,60 +1940,6 @@
     }
   }
 
-  // Location tracking
-  // -----------------
-
-  var locations = []
-    , ranges = []
-    , trackLocations;
-
-  function Marker(token) {
-    if (options.locations) {
-      this.loc = {
-          start: {
-            line: token.line
-          , column: token.range[0] - token.lineStart
-        }
-        , end: {
-            line: 0
-          , column: 0
-        }
-      };
-    }
-    if (options.ranges) this.range = [token.range[0], 0];
-  }
-
-  Marker.prototype.finish = function() {
-    if (options.locations) {
-      this.loc.end.line = previousToken.line;
-      this.loc.end.column = previousToken.range[1] - previousToken.lineStart;
-    }
-    if (options.ranges) {
-      this.range[1] = previousToken.range[1];
-    }
-  };
-
-  function createLocationMarker() {
-    return new Marker(token);
-  }
-
-  function markLocation() {
-    if (trackLocations) locations.push(createLocationMarker());
-  }
-
-  function pushLocation(marker) {
-    if (trackLocations) locations.push(marker);
-  }
-
-  function finishNode(node) {
-    if (!trackLocations) return node;
-    var location = locations.pop();
-    location.finish();
-    if (options.locations) node.loc = location.loc;
-    if (options.ranges) node.range = location.range;
-    return node;
-  }
-
   // Parser
   // ------
 
@@ -1953,9 +1975,7 @@
     scopes = [[]];
     scopeDepth = 0;
     globals = [];
-    globalNames = [];
     locations = [];
-    ranges = [];
 
     if (options.comments) comments = [];
     if (!options.wait) return end();
@@ -1986,7 +2006,7 @@
     if (options.comments) chunk.comments = comments;
     if (options.scope) chunk.globals = globals;
 
-    if (locations.length > 0 || ranges.length > 0)
+    if (locations.length > 0)
       throw new Error('Location tracking failed. This is most likely a bug in luaparse');
 
     return chunk;
