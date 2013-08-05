@@ -17,7 +17,9 @@
 	    keyword = document.getElementById('keyword'),
 	    unquoted = document.getElementById('unquoted'),
 	    string = document.getElementById('string'),
-	    regexKeyword = /^(?:serif|cursive|fantasy|inherit|initial|default|monospace|sans-serif)$/i,
+	    regexKeyword = /(?:^|[\t\n\f\r\x20])(?:serif|cursive|fantasy|inherit|initial|default|monospace|sans-serif)(?:$|[\t\n\f\r\x20])/gi,
+	    // http://www.w3.org/TR/css3-syntax/#whitespace
+	    regexWhitespace = /[\t\n\f\r\x20]/g,
 	    // Match valid unescaped identifier characters (even though they may not be valid at the start of the identifier)
 	    regexIdentifierCharacter = /^[a-zA-Z\d\xa0-\uffff_-]+$/,
 	    // If this regex matches an “identifier”, it’s an invalid one:
@@ -138,7 +140,7 @@
 
 	function escapeIdentifierSequence(string, escapeForString) {
 		var isValid = true,
-		    identifiers = string.split(' '),
+		    identifiers = string.split(regexWhitespace),
 		    index = 0,
 		    length = identifiers.length,
 		    result = [],
@@ -156,18 +158,25 @@
 			if (regexIdentifierCharacter.test(string)) {
 				// the font family name part consists of allowed characters exclusively
 				if (regexInvalidIdentifier.test(string)) {
-					// the font family name part starts with two hyphens, a digit, or a hyphen followed by a digit
+					// the font family name part starts with two hyphens, a digit, or a
+					// hyphen followed by a digit
 					if (index == 1) { // if this is the first item
 						result.push(escapeResult.output);
-					} else { // if it’s not the first item, we can simply escape the space between the two identifiers to merge them into a single identifier rather than escaping the start characters of the second identifier
+					} else {
+						// if it’s not the first item, we can simply escape the space
+						// between the two identifiers to merge them into a single
+						// identifier rather than escaping the start characters of the
+						// second identifier
 						escapeForString || (result[index - 2] += '\\');
 						result.push(cssEscape(string, true).output);
 					}
 				} else {
-					// the font family name part doesn’t start with two hyphens, a digit, or a hyphen followed by a digit
+					// the font family name part doesn’t start with two hyphens, a digit,
+					// or a hyphen followed by a digit
 					result.push(escapeResult.output);
 				}
-			} else { // the font family name part contains invalid identifier characters
+			} else {
+				// the font family name part contains invalid identifier characters
 				result.push(escapeResult.output);
 			}
 			if (escapeResult.surrogatePairCount) {
@@ -210,7 +219,7 @@
 	function update() {
 		// \r\n and \r become \n in the tokenizer as per HTML5
 		var value = input.value.replace(regexLineBreak, '\n'),
-		    isKeyword = regexKeyword.test(value),
+		    isKeyword = (regexKeyword.lastIndex = 0, regexKeyword.test(value)),
 		    escaped,
 		    escapedOutput,
 		    needsEscaping,
