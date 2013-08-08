@@ -3,7 +3,9 @@
 	var textareas = document.getElementsByTagName('textarea'),
 	    decoded = textareas[0],
 	    encoded = textareas[1],
-	    checkbox = document.getElementsByTagName('input')[0],
+	    checkboxes = document.getElementsByTagName('input'),
+	    encodeSpecialOnly = checkboxes[0],
+	    useNamedReferences = checkboxes[1],
 	    permalink = document.getElementById('permalink'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -34,7 +36,8 @@
 			decoded.value = value;
 		} else {
 			value = he.encode(decoded.value, {
-				'useNamedReferences': checkbox.checked
+				'encodeEverything': !encodeSpecialOnly.checked,
+				'useNamedReferences': useNamedReferences.checked
 			});
 			encoded.value = value;
 		}
@@ -44,8 +47,8 @@
 	};
 
 	// http://mathiasbynens.be/notes/oninput
-	decoded.onkeyup = encoded.onkeyup = checkbox.onchange = update;
-	decoded.oninput = encoded.oninput = checkbox.onchange = function() {
+	decoded.onkeyup = encoded.onkeyup = encodeSpecialOnly.onchange = useNamedReferences.onchange = update;
+	decoded.oninput = encoded.oninput = encodeSpecialOnly.onchange = useNamedReferences.onchange = function() {
 		decoded.onkeyup = encoded.onkeyup = null;
 		update.call(this);
 	};
