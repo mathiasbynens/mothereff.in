@@ -5,7 +5,8 @@
 	    textarea = document.getElementsByTagName('textarea')[0],
 	    inputs = document.getElementsByTagName('input'),
 	    checkboxOnlyASCII = inputs[0],
-	    checkboxStringBody = inputs[1],
+	    checkboxES6 = inputs[1],
+	    checkboxStringBody = inputs[2],
 	    permalink = document.getElementById('permalink'),
 	    // http://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
@@ -58,10 +59,11 @@
 			} else {
 				result = value;
 			}
-			result = stringEscape(result, {
+			result = jsesc(result, {
 				'quotes': 'single',
 				'wrap': true,
-				'escapeEverything': !checkboxOnlyASCII.checked
+				'escapeEverything': !checkboxOnlyASCII.checked,
+				'es6': checkboxES6.checked
 			});
 			text(
 				code,
@@ -88,7 +90,7 @@
 	}
 
 	// http://mathiasbynens.be/notes/oninput
-	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxStringBody.onchange = update;
+	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxES6.onchange = checkboxStringBody.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();

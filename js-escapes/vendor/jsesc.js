@@ -1,5 +1,5 @@
-/*! http://mths.be/jsesc v0.3.0 by @mathias */
-;(function(root, evil) {
+/*! http://mths.be/jsesc v0.4.3 by @mathias */
+;(function(root) {
 
 	// Detect free variables `exports`
 	var freeExports = typeof exports == 'object' && exports;
@@ -54,9 +54,6 @@
 		// simple, but good enough for what we need
 		return toString.call(value) == '[object Object]';
 	};
-	var isRegExp = function(value) {
-		return toString.call(value) == '[object RegExp]';
-	};
 	var isString = function(value) {
 		return typeof value == 'string' ||
 			toString.call(value) == '[object String]';
@@ -78,29 +75,30 @@
 		// '\v': '\\x0B'
 	};
 	var regexSingleEscape = /["'\\\b\f\n\r\t]/;
-	var regexEval = /['\n\r\u2028\u2029]/g;
 
 	var regexDigit = /[0-9]/;
 	var regexWhitelist = /[\x20\x21\x23-\x26\x28-\x5B\x5D-\x7E]/;
 
-	var stringEscape = function(argument, options) {
+	var jsesc = function(argument, options) {
 		// Handle options
 		var defaults = {
 			'escapeEverything': false,
 			'quotes': 'single',
 			'wrap': false,
+			'es6': false,
+			'json': false,
 			'compact': true,
 			'indent': '\t',
-			'__indent': '',
+			'__indent__': ''
 		};
+		var json = options && options.json;
+		if (json) {
+			defaults.quotes = 'double';
+			defaults.wrap = true;
+		}
 		options = extend(defaults, options);
 		if (options.quotes != 'single' && options.quotes != 'double') {
 			options.quotes = 'single';
-		}
-		var json = options.json;
-		if (json) {
-			options.quotes = 'double';
-			options.wrap = true;
 		}
 		var quote = options.quotes == 'double' ? '"' : '\'';
 		var compact = options.compact;
@@ -108,54 +106,53 @@
 		var oldIndent;
 		var newLine = compact ? '' : '\n';
 		var result;
+		var isEmpty = true;
 
 		if (!isString(argument)) {
 			if (isArray(argument)) {
 				result = [];
 				options.wrap = true;
-				oldIndent = options.__indent;
+				oldIndent = options.__indent__;
 				indent += oldIndent;
-				options.__indent = indent;
+				options.__indent__ = indent;
 				forEach(argument, function(value) {
+					isEmpty = false;
 					result.push(
 						(compact ? '' : indent) +
-						stringEscape(value, options)
+						jsesc(value, options)
 					);
 				});
+				if (isEmpty) {
+					return '[]';
+				}
 				return '[' + newLine + result.join(',' + newLine) + newLine +
 					(compact ? '' : oldIndent) + ']';
-			} else if (!json && isRegExp(argument)) {
-				return '/' + stringEscape(
-					evil(
-						'\'' + argument.source.replace(regexEval, stringEscape) + '\''
-					),
-					extend(options, {
-						'wrap': false,
-						'escapeEverything': false
-					}
-				)) + '/' + (argument.global ? 'g' : '') +
-				(argument.ignoreCase ? 'i' : '') + (argument.multiline ? 'm' : '');
 			} else if (!isObject(argument)) {
 				if (json) {
 					// For some values (e.g. `undefined`, `function` objects),
-					// `JSON.stringify(value)` returns `undefined` instead of `'null'`,
+					// `JSON.stringify(value)` returns `undefined` (which isn’t valid
+					// JSON) instead of `'null'`.
 					return JSON.stringify(argument) || 'null';
 				}
 				return String(argument);
 			} else { // it’s an object
 				result = [];
 				options.wrap = true;
-				oldIndent = options.__indent;
+				oldIndent = options.__indent__;
 				indent += oldIndent;
-				options.__indent = indent;
+				options.__indent__ = indent;
 				forOwn(argument, function(key, value) {
+					isEmpty = false;
 					result.push(
 						(compact ? '' : indent) +
-						stringEscape(key, options) + ':' +
+						jsesc(key, options) + ':' +
 						(compact ? '' : ' ') +
-						stringEscape(value, options)
+						jsesc(value, options)
 					);
 				});
+				if (isEmpty) {
+					return '{}';
+				}
 				return '{' + newLine + result.join(',' + newLine) + newLine +
 					(compact ? '' : oldIndent) + '}';
 			}
@@ -165,9 +162,28 @@
 		// Loop over each code unit in the string and escape it
 		var index = -1;
 		var length = string.length;
+		var first;
+		var second;
+		var codePoint;
 		result = '';
 		while (++index < length) {
 			var character = string.charAt(index);
+			if (options.es6) {
+				first = string.charCodeAt(index);
+				if ( // check if it’s the start of a surrogate pair
+					first >= 0xD800 && first <= 0xDBFF && // high surrogate
+					length > index + 1 // there is a next code unit
+				) {
+					second = string.charCodeAt(index + 1);
+					if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+						// http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+						codePoint = (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+						result += '\\u{' + codePoint.toString(16).toUpperCase() + '}';
+						index++;
+						continue;
+					}
+				}
+			}
 			if (!options.escapeEverything) {
 				if (regexWhitelist.test(character)) {
 					// It’s a printable ASCII character that is not `"`, `'` or `\`,
@@ -211,7 +227,7 @@
 		return result;
 	};
 
-	stringEscape.version = '0.3.0';
+	jsesc.version = '0.4.3';
 
 	/*--------------------------------------------------------------------------*/
 
@@ -223,16 +239,16 @@
 		define.amd
 	) {
 		define(function() {
-			return stringEscape;
+			return jsesc;
 		});
 	}	else if (freeExports && !freeExports.nodeType) {
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
-			freeModule.exports = stringEscape;
+			freeModule.exports = jsesc;
 		} else { // in Narwhal or RingoJS v0.7.0-
-			freeExports.stringEscape = stringEscape;
+			freeExports.jsesc = jsesc;
 		}
 	} else { // in Rhino or a web browser
-		root.stringEscape = stringEscape;
+		root.jsesc = jsesc;
 	}
 
-}(this, eval));
+}(this));
