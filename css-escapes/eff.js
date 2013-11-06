@@ -120,25 +120,6 @@
 		};
 	}
 
-	// Taken from mothereff.in/js-escapes
-	function jsEscape(str) {
-		return str.replace(/[\s\S]/g, function(character) {
-			var charCode = character.charCodeAt(),
-			    hexadecimal = charCode.toString(16).toUpperCase(),
-			    longhand = hexadecimal.length > 2,
-			    escape;
-			if (/[\x20-\x26\x28-\x5B\x5D-\x7E]/.test(character)) {
-				// it’s a printable ASCII character that is not `'` or `\`; don’t escape it
-				return character;
-			}
-			if (jsCache[character]) {
-				return jsCache[character];
-			}
-			escape = jsCache[character] = '\\' + (longhand ? 'u' : 'x') + ('0000' + hexadecimal).slice(longhand ? -4 : -2);
-			return escape;
-		});
-	}
-
 	function doubleSlash(str) {
 		return str.replace(/['\n\u2028\u2029\\]/g, function(chr) {
 			return jsCache[chr];
@@ -161,7 +142,7 @@
 		    surrogatePairCount = escapeResult.surrogatePairCount,
 		    // IE 8 can handle leading underscores; no point in escaping them here:
 		    qsaValue = doubleSlash(cssValue.replace(/^#\\_/, '#_')),
-		    jsValue = (checkbox.checked ? jsEscape(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
+		    jsValue = (checkbox.checked ? jsesc(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
 		    link = '#' + (+checkbox.checked) + encode(value);
 		whitespace.className = /\s/.test(value) ? 'show' : '';
 		supplements.className = surrogatePairCount ? 'show' : '';
