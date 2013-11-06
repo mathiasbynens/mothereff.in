@@ -89,12 +89,12 @@
 					}
 					charCode = ((charCode & 0x3FF) << 10) + (extraCharCode & 0x3FF) + 0x10000;
 				}
-				value = '\\' + charCode.toString(16) + ' ';
+				value = '\\' + charCode.toString(16).toUpperCase() + ' ';
 			} else {
 				// \r is already tokenized away at this point
 				// `:` can be escaped as `\:`, but that fails in IE < 8
 				if (/[\t\n\v\f:]/.test(character)) {
-					value = '\\' + charCode.toString(16) + ' ';
+					value = '\\' + charCode.toString(16).toUpperCase() + ' ';
 				} else if (/[ !"#$%&'()*+,./;<=>?@\[\\\]^`{|}~]/.test(character)) {
 					value = '\\' + character;
 				} else {
@@ -124,7 +124,7 @@
 	function jsEscape(str) {
 		return str.replace(/[\s\S]/g, function(character) {
 			var charCode = character.charCodeAt(),
-			    hexadecimal = charCode.toString(16),
+			    hexadecimal = charCode.toString(16).toUpperCase(),
 			    longhand = hexadecimal.length > 2,
 			    escape;
 			if (/[\x20-\x26\x28-\x5B\x5D-\x7E]/.test(character)) {
