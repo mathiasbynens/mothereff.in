@@ -61,6 +61,12 @@
 		update();
 	};
 
+	a.onpaste = b.onpaste = function(event) {
+		event.preventDefault();
+		var text = event.clipboardData.getData('text/plain').trim();
+		document.execCommand('insertText', false, text);
+	};
+
 	if (storage) {
 		storage.a && text(a, storage.a);
 		storage.b && text(b, storage.b);

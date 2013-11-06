@@ -65,6 +65,12 @@
 		update.call(this);
 	};
 
+	decoded.onpaste = encoded.onpaste = function(event) {
+		event.preventDefault();
+		var text = event.clipboardData.getData('text/plain').trim();
+		document.execCommand('insertText', false, text);
+	};
+
 	if (storage) {
 		storage.decoded && text(decoded, storage.decoded);
 		storage.encoded && text(encoded, storage.encoded);

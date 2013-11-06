@@ -17,7 +17,7 @@
 	    	'\b': '\\b',
 	    	'\t': '\\t',
 	    	'\n': '\\n',
-	    	'\v': '\\x0b', // In IE < 9, '\v' == 'v'
+	    	'\v': '\\x0B', // In IE < 9, '\v' == 'v'
 	    	'\f': '\\f',
 	    	'\r': '\\r',
 	    	// escape double quotes, \u2028, and \u2029 too, as they break input
@@ -127,7 +127,7 @@
 			    hexadecimal = charCode.toString(16),
 			    longhand = hexadecimal.length > 2,
 			    escape;
-			if (/[\x20-\x26\x28-\x5b\x5d-\x7e]/.test(character)) {
+			if (/[\x20-\x26\x28-\x5B\x5D-\x7E]/.test(character)) {
 				// it’s a printable ASCII character that is not `'` or `\`; don’t escape it
 				return character;
 			}
@@ -181,6 +181,12 @@
 	input.oninput = function() {
 		this.onkeyup = null;
 		update();
+	};
+
+	input.onpaste = function(event) {
+		event.preventDefault();
+		var text = event.clipboardData.getData('text/plain').trim();
+		document.execCommand('insertText', false, text);
 	};
 
 	if (storage && storage.cssEscapes) {

@@ -76,6 +76,12 @@
 		update();
 	};
 
+	input.onpaste = function(event) {
+		event.preventDefault();
+		var text = event.clipboardData.getData('text/plain').trim();
+		document.execCommand('insertText', false, text);
+	};
+
 	if (storage && storage.unquotedAttributes) {
 		input.value = storage.unquotedAttributes;
 		update();
