@@ -96,6 +96,13 @@
 		update();
 	};
 
+	pre.ondblclick = function() {
+		var selection = window.getSelection();
+		var range = document.createRange();
+		range.selectNodeContents(pre);
+		selection.removeAllRanges();
+		selection.addRange(range);
+	};
 
 	if (storage) {
 		storage.jsEscapeText && (textarea.value = storage.jsEscapeText);
