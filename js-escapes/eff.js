@@ -43,6 +43,17 @@
 		el.textContent != null && (el.textContent = str);
 	}
 
+	// Unescape ES6 Unicode code point escapes
+	// http://mathiasbynens.be/notes/javascript-escapes#unicode-code-point
+	// This is for browsers who support ES3/ES5 but haven’t implemented the new
+	// ES6 escape sequences yet.
+	function unescapeES6(string) {
+		return string.replace(/\\u\{([a-fA-F0-9]{1,6})\}/g, function($0, $1) {
+			var codePoint = parseInt($1, 16);
+			return String.fromCodePoint(codePoint);
+		});
+	}
+
 	function update() {
 		var value = textarea.value.replace(/\\\n/g, ''); // LineContinuation
 		var result;
@@ -50,7 +61,7 @@
 			if (checkboxStringBody.checked) {
 				result = evil(
 					'"'
-					+ value.replace(/[\n\u2028\u2029"']/g, function(chr) {
+					+ unescapeES6(value).replace(/[\n\u2028\u2029"']/g, function(chr) {
 						return cache[chr];
 					})
 					.replace(/\\v/g, '\x0B') // In IE < 9, '\v' == 'v'; this normalizes the input
