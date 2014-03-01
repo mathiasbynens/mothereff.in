@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset=utf-8>
+<title>Legacy HTML color value previewer</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel=stylesheet href=eff.css>
+<meta name=description content="Wondering what a given legacy HTML color value looks like? This tool will show you.">
+<h1>Legacy HTML color value previewer</h1>
+<p>Wondering what a given legacy HTML color value (as seen in <code>bgcolor</code>, <code>text</code>, <code>link</code>, <code>vlink</code>, and <code>alink</code> attribute values) looks like? <a href=http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#rules-for-parsing-a-legacy-color-value>Read the spec</a>, or just use this tool.</p>
+<noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
+<pre><code><span class=sc2>&lt;<span class=element>body</span> <span class=attribute>bgcolor</span><span class=symbol>=</span><span class=quote><b>"</b><div contenteditable id=input>chucknorris</div><b>"</b></span>><a href=#chucknorris id=permalink>permalink</a>, <a href="data:text/html;charset=utf-8,<body bgcolor=chucknorris>" id=example>example</a>&lt;<span class=symbol>/</span><span class=element>body</span>></code></pre>
+<iframe id=result srcdoc="<body bgcolor=&quot;chucknorris&quot;>"></iframe>
+<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/bgcolor>fork this on GitHub!</a></p>
+<script src=eff.js></script>
