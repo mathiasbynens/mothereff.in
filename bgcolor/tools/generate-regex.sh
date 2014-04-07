@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # http://code.google.com/p/esprima/issues/detail?id=110#c1
 

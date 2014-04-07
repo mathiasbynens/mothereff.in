@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "Updating dependencies..."
 ./byte-counter/vendor/update.sh
