@@ -2,7 +2,7 @@
 
 	var input = document.getElementsByTagName('input')[0];
 	var valid = window.valid;
-	var invalid = window.invalid;
+	var message = window.message;
 	var permalink = document.getElementById('permalink');
 	// http://mathiasbynens.be/notes/localstorage-pattern
 	var storage = (function() {
@@ -27,17 +27,24 @@
 
 	function update() {
 		var value = input.value;
-		try {
+		var result = validate(value);
+		if (result.isValid) {
 			validate(value);
 			valid.className = 'show';
-			invalid.className = 'hide';
-			input.className = 'valid';
-		} catch(exception) {
-			// Note: the use of `innerHTML` is intended and safe in this case, since
-			// we fully control the error messages.
-			invalid.innerHTML = exception.message;
+			if (result.message) {
+				input.className = 'warning';
+				// Note: the use of `innerHTML` is intended and safe in this case,
+				// since we fully control the error messages.
+				message.innerHTML = '<em>However</em>, as a best practice, ' + result.message;
+				message.className = 'show';
+			} else {
+				input.className = 'valid';
+				message.className = 'hide';
+			}
+		} else {
+			message.innerHTML = result.message;
+			message.className = 'show';
 			valid.className = 'hide';
-			invalid.className = 'show';
 			input.className = 'invalid';
 		}
 		permalink.hash = encode(value);

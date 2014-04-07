@@ -41,11 +41,11 @@ i {
 	padding-bottom: 0;
 }
 
-#valid.show, #invalid.show {
+#valid.show, #message.show {
 	display: block;
 }
 
-#valid.hide, #invalid.hide {
+#valid.hide, #message.hide {
 	display: none;
 }
 
@@ -58,6 +58,11 @@ pre {
 .invalid {
 	border-color: red;
 	background: #ffb6c1;
+}
+
+.warning {
+	border-color: #f89406;
+	background: #fdfd9a;
 }
 
 input {

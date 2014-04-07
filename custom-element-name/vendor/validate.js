@@ -12,43 +12,68 @@ var reservedNames = [
 	'missing-glyph'
 ];
 
-module.exports = function (name) {
+function hasError(name) {
 	if (!name) {
-		throw new Error('Missing element name');
+		return 'Missing element name.';
 	}
 
 	if (name.indexOf('-') === -1) {
-		throw new Error('Custom element names must contain a hyphen. Example: unicorn-cake');
-	}
-
-	if (/^polymer-/.test(name)) {
-		throw new Error('Custom element names should not start with `polymer-`.\nSee: http://webcomponents.github.io/articles/how-should-i-name-my-element');
-	}
-
-	if (/^x-/.test(name)) {
-		throw new Error('Custom element names should not start with `x-`.\nSee: http://webcomponents.github.io/articles/how-should-i-name-my-element/');
-	}
-
-	if (/^ng-/.test(name)) {
-		throw new Error('Custom element names should not start with `ng-`.\nSee: http://docs.angularjs.org/guide/directive#creating-directives');
+		return 'Custom element names must contain a hyphen. Example: unicorn-cake';
 	}
 
 	if (/^\d/i.test(name)) {
-		throw new Error('Custom element names must not start with a digit');
+		return 'Custom element names must not start with a digit.';
 	}
 
 	if (/^-/i.test(name)) {
-		throw new Error('Custom element names must not start with a hyphen');
+		return 'Custom element names must not start with a hyphen.';
 	}
 
 	// http://www.w3.org/TR/custom-elements/#concepts
 	if (!ncname.test(name)) {
-		throw new Error('Invalid element name.');
+		return 'Invalid element name.';
 	}
 
 	if (reservedNames.indexOf(name) !== -1) {
-		throw new Error('The supplied element name is reserved and can\'t be used.\nSee: http://www.w3.org/TR/custom-elements/#concepts');
+		return 'The supplied element name is reserved and can\'t be used.\nSee: http://www.w3.org/TR/custom-elements/#concepts';
+	}
+};
+
+function hasWarning(name) {
+	if (/^polymer-/.test(name)) {
+		return 'Custom element names should not start with `polymer-`.\nSee: http://webcomponents.github.io/articles/how-should-i-name-my-element';
 	}
 
-	return true;
+	if (/^x-/.test(name)) {
+		return 'Custom element names should not start with `x-`.\nSee: http://webcomponents.github.io/articles/how-should-i-name-my-element/';
+	}
+
+	if (/^ng-/.test(name)) {
+		return 'Custom element names should not start with `ng-`.\nSee: http://docs.angularjs.org/guide/directive#creating-directives';
+	}
+
+	if (/-$/.test(name)) {
+		return 'Custom element names should not end with an hyphen.';
+	}
+
+	if (/[^\x20-\x7E]+/.test(name)) {
+		return 'Custom element names should not contain non-ASCII characters.';
+	}
+
+	if (/--/.test(name)) {
+		return 'Custom element names should not contain consecutive hyphens.';
+	}
+
+	if (/[^a-z0-9]{2}/.test(name)) {
+		return 'Custom element names should not contain consecutive non-alpha characters.';
+	}
+}
+
+module.exports = function (name) {
+	var errMsg = hasError(name);
+
+	return {
+		isValid: !errMsg,
+		message: errMsg || hasWarning(name)
+	};
 };
