@@ -67,6 +67,10 @@
 			return 'custom element names should not start with <code>ng-</code>.\nSee <a href=http://docs.angularjs.org/guide/directive#creating-directives>“How to create an AngularJS directive”</a>.';
 		}
 
+		if (/^[^a-z]/i.test(name)) {
+			return 'this element name is only valid in XHTML, not in HTML. The first character should be in the range <code>[a-zA-Z]</code>.';
+		}
+
 		if (/-$/.test(name)) {
 			return 'custom element names should not end with an hyphen.';
 		}
