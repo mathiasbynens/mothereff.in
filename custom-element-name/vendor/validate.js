@@ -40,24 +40,36 @@ function hasError(name) {
 };
 
 function hasWarning(name) {
-	if (/^polymer-/.test(name)) {
+	if (/^polymer-/i.test(name)) {
 		return 'Custom element names should not start with `polymer-`.\nSee: http://webcomponents.github.io/articles/how-should-i-name-my-element';
 	}
 
-	if (/^x-/.test(name)) {
+	if (/^x-/i.test(name)) {
 		return 'Custom element names should not start with `x-`.\nSee: http://webcomponents.github.io/articles/how-should-i-name-my-element/';
 	}
 
-	if (/^ng-/.test(name)) {
+	if (/^ng-/i.test(name)) {
 		return 'Custom element names should not start with `ng-`.\nSee: http://docs.angularjs.org/guide/directive#creating-directives';
+	}
+
+	if (/^xml/i.test(name)) {
+		return 'Custom element names should not start with `xml`.';
+	}
+
+	if (name.toLowerCase() !== name) {
+		return 'Custom element names should be lowercase.';
 	}
 
 	if (/^[^a-z]/i.test(name)) {
 		return 'This element name is only valid in XHTML, not in HTML. First character should be in the range a-z.';
 	}
 
-	if (/-$/.test(name)) {
-		return 'Custom element names should not end with an hyphen.';
+	if (/[^a-z0-9]$/i.test(name)) {
+		return 'Custom element names should not end with a non-alpha character.';
+	}
+
+	if (/[\.]/.test(name)) {
+		return 'Custom element names should not contain a dot character as it would need to be escaped in a CSS selector.';
 	}
 
 	if (/[^\x20-\x7E]/.test(name)) {
@@ -68,7 +80,7 @@ function hasWarning(name) {
 		return 'Custom element names should not contain consecutive hyphens.';
 	}
 
-	if (/[^a-z0-9]{2}/.test(name)) {
+	if (/[^a-z0-9]{2}/i.test(name)) {
 		return 'Custom element names should not contain consecutive non-alpha characters.';
 	}
 }
