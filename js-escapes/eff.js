@@ -1,32 +1,32 @@
 (function(window, document, evil) {
 
-	var pre = document.getElementsByTagName('pre')[0],
-	    code = document.getElementsByTagName('code')[0],
-	    textarea = document.getElementsByTagName('textarea')[0],
-	    inputs = document.getElementsByTagName('input'),
-	    checkboxOnlyASCII = inputs[0],
-	    checkboxES6 = inputs[1],
-	    checkboxStringBody = inputs[2],
-	    permalink = document.getElementById('permalink'),
-	    // http://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    cache = {
-	    	'\n': '\\n',
-	    	'\"': '\\\"',
-	    	'\u2028': '\\u2028',
-	    	'\u2029': '\\u2029',
-	    	'\'': '\\\''
-	    };
+	var pre = document.getElementsByTagName('pre')[0];
+	var code = document.getElementsByTagName('code')[0];
+	var textarea = document.getElementsByTagName('textarea')[0];
+	var inputs = document.getElementsByTagName('input');
+	var checkboxOnlyASCII = inputs[0];
+	var checkboxES6 = inputs[1];
+	var checkboxStringBody = inputs[2];
+	var permalink = document.getElementById('permalink');
+	// http://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch(exception) {}
+	}());
+	var cache = {
+		'\n': '\\n',
+		'\"': '\\\"',
+		'\u2028': '\\u2028',
+		'\u2029': '\\u2029',
+		'\'': '\\\''
+	};
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -138,8 +138,8 @@
 // Google Analytics
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
 	g.src = '//www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));
