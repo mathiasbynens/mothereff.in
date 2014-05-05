@@ -28,10 +28,10 @@
 		var shouldDecode = this == encoded;
 		var value;
 		if (shouldDecode) {
-			value = quotedPrintable.decode(encoded.value);
+			value = utf8.decode(quotedPrintable.decode(encoded.value));
 			decoded.value = value;
 		} else {
-			value = quotedPrintable.encode(decoded.value);
+			value = quotedPrintable.encode(utf8.encode(decoded.value));
 			encoded.value = value;
 		}
 		value = decoded.value;
