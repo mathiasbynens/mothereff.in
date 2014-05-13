@@ -17,6 +17,10 @@ function hasError(name) {
 		return 'Missing element name.';
 	}
 
+	if (name.toLowerCase() !== name) {
+		return 'Custom element names must be lowercase.';
+	}
+
 	if (name.indexOf('-') === -1) {
 		return 'Custom element names must contain a hyphen. Example: unicorn-cake';
 	}
@@ -54,10 +58,6 @@ function hasWarning(name) {
 
 	if (/^xml/i.test(name)) {
 		return 'Custom element names should not start with `xml`.';
-	}
-
-	if (name.toLowerCase() !== name) {
-		return 'Custom element names should be lowercase.';
 	}
 
 	if (/^[^a-z]/i.test(name)) {

@@ -32,6 +32,10 @@
 			return 'Missing element name.';
 		}
 
+		if (name.toLowerCase() != name) {
+			return 'Custom element names must be lowercase.';
+		}
+
 		if (name.indexOf('-') === -1) {
 			return 'Custom element names must contain a hyphen. Example: <code>unicorn-cake</code>.';
 		}
@@ -69,10 +73,6 @@
 
 		if (/^xml/i.test(name)) {
 			return 'custom element names should not start with <code>xml</code>.';
-		}
-
-		if (name.toLowerCase() != name) {
-			return 'custom element names should be lowercase.';
 		}
 
 		if (/^[^a-z]/i.test(name)) {
