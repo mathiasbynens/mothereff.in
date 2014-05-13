@@ -76,7 +76,7 @@
 		}
 
 		if (/^[^a-z]/i.test(name)) {
-			return 'this element name is only valid in XHTML, not in HTML. The first character should be in the range <code>[a-zA-Z]</code>.';
+			return 'the first character should be in the range <code>[a-zA-Z]</code>. Otherwise, this element name is only valid in XHTML, not in HTML.';
 		}
 
 		if (/[^a-z0-9]$/i.test(name)) {
