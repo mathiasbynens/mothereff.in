@@ -32,8 +32,8 @@
 			return 'Missing element name.';
 		}
 
-		if (name.toLowerCase() != name) {
-			return 'Custom element names must be lowercase.';
+		if (/[A-Z]/.test(name)) {
+			return 'Custom element names must not contain uppercase ASCII characters.';
 		}
 
 		if (name.indexOf('-') === -1) {
