@@ -79,7 +79,7 @@ code {
 	word-wrap: break-word;
 }
 
-.comment, h2 {
+.comment, #empty-comment, h2 {
 	font-style: italic;
 	color: #060;
 }
@@ -108,14 +108,23 @@ code {
 	color: #606;
 }
 
-#whitespace, #supplementary-characters {
+#whitespace, #supplementary-characters, #empty {
 	display: none;
 	font-weight: bold;
 	color: #b00b00;
 }
 
-#whitespace.show, #supplementary-characters.show {
+#whitespace.show, #supplementary-characters.show, #empty.show {
 	display: block;
+}
+
+#empty-comment {
+	display: none;
+	font-weight: bold;
+}
+
+#empty-comment.show {
+	display: inline;
 }
 
 @media (min-width: 42em) {

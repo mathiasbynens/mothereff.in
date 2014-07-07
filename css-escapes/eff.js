@@ -1,45 +1,47 @@
 (function(window, document) {
 
-	var input = document.getElementsByTagName('div')[0],
-	    checkbox = document.getElementsByTagName('input')[0],
-	    quotes = document.getElementsByTagName('b'),
-	    marks = document.getElementsByTagName('mark'),
-	    css = marks[0],
-	    js = marks[1],
-	    qsa = marks[2],
-	    permalink = document.getElementById('permalink'),
-	    example = document.getElementById('example'),
-	    whitespace = document.getElementById('whitespace'),
-	    supplements = document.getElementById('supplementary-characters'),
-	    jsCache = {
-	    	// http://es5.github.com/#x7.8.4
-	    	// Table 4 — String Single Character Escape Sequences
-	    	'\b': '\\b',
-	    	'\t': '\\t',
-	    	'\n': '\\n',
-	    	'\v': '\\x0B', // In IE < 9, '\v' == 'v'
-	    	'\f': '\\f',
-	    	'\r': '\\r',
-	    	// escape double quotes, \u2028, and \u2029 too, as they break input
-	    	'\"': '\\\"',
-	    	'\u2028': '\\u2028',
-	    	'\u2029': '\\u2029',
-	    	// we’re wrapping the string in single quotes, so escape those too
-	    	'\'': '\\\'',
-	    	'\\': '\\\\'
-	    },
-	    // http://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }());
+	var input = document.getElementsByTagName('div')[0];
+	var checkbox = document.getElementsByTagName('input')[0];
+	var quotes = document.getElementsByTagName('b');
+	var marks = document.getElementsByTagName('mark');
+	var css = marks[0];
+	var js = marks[1];
+	var qsa = marks[2];
+	var empty = document.getElementById('empty');
+	var emptyComment = document.getElementById('empty-comment');
+	var permalink = document.getElementById('permalink');
+	var example = document.getElementById('example');
+	var whitespace = document.getElementById('whitespace');
+	var supplements = document.getElementById('supplementary-characters');
+	var jsCache = {
+		// http://es5.github.com/#x7.8.4
+		// Table 4 — String Single Character Escape Sequences
+		'\b': '\\b',
+		'\t': '\\t',
+		'\n': '\\n',
+		'\v': '\\x0B', // In IE < 9, '\v' == 'v'
+		'\f': '\\f',
+		'\r': '\\r',
+		// escape double quotes, \u2028, and \u2029 too, as they break input
+		'\"': '\\\"',
+		'\u2028': '\\u2028',
+		'\u2029': '\\u2029',
+		// we’re wrapping the string in single quotes, so escape those too
+		'\'': '\\\'',
+		'\\': '\\\\'
+	};
+	// http://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date,
+		    storage,
+		    result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch(exception) {}
+	}());
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -136,14 +138,27 @@
 
 	function update(event) {
 		// \r\n and \r become \n in the tokenizer as per HTML5
-		var value = text(input).replace(/\r\n?/g, '\n'),
-		    escapeResult = cssEscape(value, checkbox.checked),
-		    cssValue = '#' + escapeResult.output,
-		    surrogatePairCount = escapeResult.surrogatePairCount,
-		    // IE 8 can handle leading underscores; no point in escaping them here:
-		    qsaValue = doubleSlash(cssValue.replace(/^#\\_/, '#_')),
-		    jsValue = (checkbox.checked ? jsesc(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script'), // http://mths.be/etago
-		    link = '#' + (+checkbox.checked) + encode(value);
+		var value = text(input).replace(/\r\n?/g, '\n');
+		var cssValue;
+		var surrogatePairCount;
+		var qsaValue;
+		var jsValue;
+		if (!value) {
+			empty.className = emptyComment.className = 'show';
+			qsaValue = cssValue = '[id=""]';
+			jsValue = '';
+			surrogatePairCount = 0;
+		} else {
+			empty.className = emptyComment.className = ''; // hide
+			var escapeResult = cssEscape(value, checkbox.checked);
+			cssValue = '#' + escapeResult.output;
+			surrogatePairCount = escapeResult.surrogatePairCount;
+			// IE 8 can handle leading underscores; no point in escaping them here:
+			qsaValue = doubleSlash(cssValue.replace(/^#\\_/, '#_'));
+			// http://mths.be/etago
+			jsValue = (checkbox.checked ? jsesc(value) : doubleSlash(value)).replace(/<\/script/g, '<\\/script');
+		}
+		var link = '#' + (+checkbox.checked) + encode(value);
 		whitespace.className = /\s/.test(value) ? 'show' : '';
 		supplements.className = surrogatePairCount ? 'show' : '';
 		forEach(quotes, function(el) {
