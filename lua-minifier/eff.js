@@ -10,7 +10,7 @@
 	    after = dds[1],
 	    ratio = dds[2],
 	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -24,7 +24,7 @@
 	    }()),
 	    characterReferences;
 
-	// Taken from http://mths.be/punycode
+	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
 		var output = [],
 		    counter = 0,
@@ -94,7 +94,7 @@
 		permalink.hash = encode(value);
 	};
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

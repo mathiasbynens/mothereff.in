@@ -1,5 +1,5 @@
-# [String reverser](http://mothereff.in/reverse-string)
+# [String reverser](https://mothereff.in/reverse-string)
 
-This tool will automatically reverse any string you enter, using [Esrever](http://mths.be/esrever).
+This tool will automatically reverse any string you enter, using [Esrever](https://mths.be/esrever).
 
-Made by [Mathias Bynens](http://mathiasbynens.be/).
+Made by [Mathias Bynens](https://mathiasbynens.be/).

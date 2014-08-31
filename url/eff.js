@@ -4,7 +4,7 @@
 	var decoded = textareas[0];
 	var encoded = textareas[1];
 	var permalink = document.getElementById('permalink');
-	// http://mathiasbynens.be/notes/localstorage-pattern
+	// https://mathiasbynens.be/notes/localstorage-pattern
 	var storage = (function() {
 		var uid = new Date;
 		var storage;
@@ -51,7 +51,7 @@
 		storage && (storage.urlEncoded = decodedString);
 	};
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	decoded.onkeyup = encoded.onkeyup = update;
 	decoded.oninput = encoded.oninput = function() {
 		decoded.onkeyup = encoded.onkeyup = null;

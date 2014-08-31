@@ -8,7 +8,7 @@
 	    regexAnyCharacter = /[\s\S]/g,
 	    regexBinary = /^(\s*[01]{8}\s*)*$/,
 	    regexExtendedASCII = /^[\x00-\xff]*$/,
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -68,7 +68,7 @@
 		storage && (storage.ascii = value);
 	};
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	ascii.onkeyup = binary.onkeyup = update;
 	ascii.oninput = binary.oninput = function() {
 		ascii.onkeyup = binary.onkeyup = null;

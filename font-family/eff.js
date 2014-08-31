@@ -31,7 +31,7 @@
 	    regexLineBreak = /\r\n?/g,
 	    regexSimpleEscapeCharacters = /[ !"#$%&'()*+,.\/;<=>?@\[\\\]^`{|}~]/,
 	    regexSpaceAtStart = /^\x20/,
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -81,9 +81,9 @@
 		return '\'' + string.replace(regexSingleQuote, '\\\'') + '\'';
 	}
 
-	// http://mathiasbynens.be/notes/css-escapes
+	// https://mathiasbynens.be/notes/css-escapes
 	function cssEscape(string, escapeForString) {
-		// Based on `ucs2decode` from http://mths.be/punycode
+		// Based on `ucs2decode` from https://mths.be/punycode
 		var firstChar = string.charAt(0),
 		    output = '',
 		    counter = 0,
@@ -247,7 +247,7 @@
 		storage && (storage.fontFamily = value);
 	}
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	input.onkeydown = checkbox.onchange = update;
 	input.oninput = function() {
 		this.onkeydown = null;
@@ -270,7 +270,7 @@
 
 }(this, document));
 
-// Optimized Google Analytics snippet: http://mths.be/aab */
+// Optimized Google Analytics snippet: https://mths.be/aab */
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
 	var g = d.createElement(t),

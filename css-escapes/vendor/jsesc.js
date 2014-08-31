@@ -1,4 +1,4 @@
-/*! http://mths.be/jsesc v0.4.3 by @mathias */
+/*! https://mths.be/jsesc v0.4.3 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -61,7 +61,7 @@
 
 	/*--------------------------------------------------------------------------*/
 
-	// http://mathiasbynens.be/notes/javascript-escapes#single
+	// https://mathiasbynens.be/notes/javascript-escapes#single
 	var singleEscapes = {
 		'"': '\\"',
 		'\'': '\\\'',
@@ -77,7 +77,7 @@
 	var regexSingleEscape = /["'\\\b\f\n\r\t]/;
 
 	var regexDigit = /[0-9]/;
-	var regexWhitelist = /[\x20\x21\x23-\x26\x28-\x5B\x5D-\x7E]/;
+	var regexWhitelist = /[ !#-&\(-\[\]-~]/;
 
 	var jsesc = function(argument, options) {
 		// Handle options
@@ -176,7 +176,7 @@
 				) {
 					second = string.charCodeAt(index + 1);
 					if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
-						// http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+						// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 						codePoint = (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
 						result += '\\u{' + codePoint.toString(16).toUpperCase() + '}';
 						index++;

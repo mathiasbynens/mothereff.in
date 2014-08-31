@@ -1,4 +1,4 @@
-/*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
+/*! https://mths.be/fromcodepoint v0.1.0 by @mathias */
 if (!String.fromCodePoint) {
 	(function() {
 		var stringFromCharCode = String.fromCharCode;
@@ -25,7 +25,7 @@ if (!String.fromCodePoint) {
 				if (codePoint <= 0xFFFF) { // BMP code point
 					codeUnits.push(codePoint);
 				} else { // Astral code point; split in surrogate halves
-					// http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+					// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 					codePoint -= 0x10000;
 					highSurrogate = (codePoint >> 10) + 0xD800;
 					lowSurrogate = (codePoint % 0x400) + 0xDC00;

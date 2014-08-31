@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang=en>
 <meta charset=utf-8>
-<title>Mothereffing unquoted attribute value validator</title>
+<title>Unquoted attribute value validator</title>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <link rel=stylesheet href=eff.css>
 <meta name=description content="Wondering if you can use a given character sequence as an unquoted attribute value in HTML or CSS? This tool will tell you.">
 <hgroup>
-	<h1>Mothereffing unquoted attribute value validator</h1>
+	<h1>Unquoted attribute value validator</h1>
 	<h2>“Can I use <code>&lt;a href=<var>foo</var>>&lt;/a></code> and <code>a[href=<var>foo</var>] {}</code> or does it need quotes?”</h2>
 </hgroup>
 <noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
@@ -15,7 +15,7 @@
 <pre class=invalid><code>&lt;<span class=element>a</span> <span class=attribute>href</span><span class=symbol>=</span><span class=quote><mark>mailto:foo@example.org?subject=bar</mark></span>><a href=#mailto%3Afoo%40example.org%3Fsubject%3Dbar id=permalink>permalink</a>&lt;<span class=symbol>/</span><span class=element>a</span>></code></pre>
 <p>In CSS, that’s <i>an invalid</i> unquoted attribute value:
 <pre class=invalid><code><span class=sc2>&lt;<span class=element>style</span>></span><br> <span class=element> a</span><span class=symbol>[</span><span class=attribute>href</span><span class=symbol>=</span><mark>mailto:foo@example.org?subject=bar</mark><span class=symbol>]</span> <span class=parens>{</span><br>    <span class=property>background</span><span class=symbol>:</span> hotpink<span class=symbol>;</span><br>  <span class=parens>}</span><br><span class=sc2>&lt;<span class=symbol>/</span><span class=element>style</span>></span></code></pre>
-<p>To quote <a href=http://mathiasbynens.be/notes/unquoted-attribute-values>“Unquoted attribute values in HTML and CSS”</a>:
-<blockquote cite=http://mathiasbynens.be/notes/unquoted-attribute-values><p>A valid unquoted attribute value in HTML is any string of text that is not the empty string and that doesn’t contain spaces, tabs, line feeds, form feeds, carriage returns, <code>"</code>, <code>'</code>, <code>`</code>, <code>=</code>, <code>&lt;</code>, or <code>></code>.<p>A valid unquoted attribute value in CSS is any string of text that is not the empty string, consists of escaped characters and/or characters matching <code>/[-_\u00A0-\u10FFFF]/</code> entirely, and doesn’t start with a digit or two hyphens or a hyphen followed by a digit.</blockquote>
-<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> for <a href=//paulirish.com/>π</a> — <a href=https://github.com/mathiasbynens/mothereff.in>fork this on GitHub!</a></p>
+<p>To quote <a href=https://mathiasbynens.be/notes/unquoted-attribute-values>“Unquoted attribute values in HTML and CSS”</a>:
+<blockquote cite=https://mathiasbynens.be/notes/unquoted-attribute-values><p>A valid unquoted attribute value in HTML is any string of text that is not the empty string and that doesn’t contain spaces, tabs, line feeds, form feeds, carriage returns, <code>"</code>, <code>'</code>, <code>`</code>, <code>=</code>, <code>&lt;</code>, or <code>></code>.<p>A valid unquoted attribute value in CSS is any string of text that is not the empty string, consists of escaped characters and/or characters matching <code>/[-_\u00A0-\u10FFFF]/</code> entirely, and doesn’t start with a digit or two hyphens or a hyphen followed by a digit.</blockquote>
+<p id=footer>Made by <a href=https://mathiasbynens.be/>@mathias</a> for <a href=http://paulirish.com/>π</a> — <a href=https://github.com/mathiasbynens/mothereff.in>fork this on GitHub!</a></p>
 <script src=eff.js></script>

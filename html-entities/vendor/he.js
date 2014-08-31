@@ -1,4 +1,4 @@
-/*! http://mths.be/he v0.4.1 by @mathias | MIT license */
+/*! https://mths.be/he v0.4.1 by @mathias | MIT license */
 ;(function(root) {
 
 	// Detect free variables `exports`.
@@ -37,7 +37,7 @@
 		'&': '&amp;',
 		'\'': '&#x27;',
 		'<': '&lt;',
-		// See http://mathiasbynens.be/notes/ambiguous-ampersands: in HTML, the
+		// See https://mathiasbynens.be/notes/ambiguous-ampersands: in HTML, the
 		// following is not strictly necessary unless it’s part of a tag or an
 		// unquoted attribute value. We’re only escaping it to support those
 		// situations, and for XML support.
@@ -92,7 +92,7 @@
 		return result;
 	};
 
-	// Modified version of `ucs2encode`; see http://mths.be/punycode.
+	// Modified version of `ucs2encode`; see https://mths.be/punycode.
 	var codePointToSymbol = function(codePoint, strict) {
 		var output = '';
 		if ((codePoint >= 0xD800 && codePoint <= 0xDFFF) || codePoint > 0x10FFFF) {
@@ -191,7 +191,7 @@
 		return string
 			// Encode astral symbols.
 			.replace(regexAstralSymbols, function($0) {
-				// http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+				// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 				var high = $0.charCodeAt(0);
 				var low = $0.charCodeAt(1);
 				var codePoint = (high - 0xD800) * 0x400 + low - 0xDC00 + 0x10000;
@@ -245,7 +245,7 @@
 				if (has(decodeMap, reference)) {
 					return decodeMap[reference];
 				} else {
-					// Ambiguous ampersand; see http://mths.be/notes/ambiguous-ampersands.
+					// Ambiguous ampersand; see https://mths.be/notes/ambiguous-ampersands.
 					if (strict) {
 						parseError(
 							'named character reference was not terminated by a semicolon'

@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/vendor"
 
 for file in Zeon.js zeparser/Tokenizer.js zeparser/ZeParser.js; do
-	curl -O "https://raw.github.com/qfox/Zeon/master/$file"
+	curl -O "https://raw.githubusercontent.com/qfox/Zeon/master/$file"
 done
 
 cat Tokenizer.js ZeParser.js Zeon.js ../eff.js > ../all.js.tmp

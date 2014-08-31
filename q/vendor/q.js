@@ -1,4 +1,4 @@
-/*! http://mths.be/q v0.1.1 by @mathias | MIT license */
+/*! https://mths.be/q v0.1.1 by @mathias | MIT license */
 ;(function(root) {
 
 	// Detect free variables `exports`.

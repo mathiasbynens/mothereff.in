@@ -1,4 +1,4 @@
-/*! http://mths.be/luamin v0.2.7 by @mathias */
+/*! https://mths.be/luamin v0.2.7 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`

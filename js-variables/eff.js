@@ -29,9 +29,9 @@
 	    regexImmutableProps = /^(?:NaN|Infinity|undefined)$/,
 	    // Zero-width characters that are allowed in IdentifierPart as per ES5
 	    regexZeroWidth = /\u200C|\u200D/,
-	    // http://mathiasbynens.be/notes/javascript-escapes#unicode
+	    // https://mathiasbynens.be/notes/javascript-escapes#unicode
 	    regexUnicodeEscape = /\\u([a-fA-F0-9]{4})/g,
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -61,7 +61,7 @@
 		    immutableWarning,
 		    isReserved,
 		    hasZeroWidth;
-		// only Unicode escapes are allowed: http://mathiasbynens.be/notes/javascript-escapes#unicode
+		// only Unicode escapes are allowed: https://mathiasbynens.be/notes/javascript-escapes#unicode
 		tmp = value.replace(regexUnicodeEscape, function($0, $1) {
 			return stringFromCharCode(parseInt($1, 16));
 		});
@@ -95,7 +95,7 @@
 		storage && (storage.jsVars = value);
 	}
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	input.onkeyup = update;
 	input.oninput = function() {
 		input.onkeyup = null;

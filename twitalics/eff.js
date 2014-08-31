@@ -10,7 +10,7 @@
 	    italic = checkboxes[3],
 	    bold = checkboxes[4],
 	    permalink = document.getElementById('permalink'),
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -134,7 +134,7 @@
 		permalink.hash = encode(textarea.value);
 	}
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = script.onchange = fraktur.onchange = serif.onchange = italic.onchange = bold.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

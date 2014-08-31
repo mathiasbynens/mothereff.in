@@ -6,7 +6,7 @@
 	    permalink = document.getElementById('permalink'),
 	    regexBase64 = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/,
 	    regexWhitespace = /\s/g,
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -75,7 +75,7 @@
 		storage && (storage.base64 = unicodeString);
 	};
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	unicode.onkeyup = base64.onkeyup = update;
 	unicode.oninput = base64.oninput = function() {
 		unicode.onkeyup = base64.onkeyup = null;

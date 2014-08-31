@@ -5,7 +5,7 @@
 	    pre = document.getElementsByTagName('pre')[0],
 	    output = document.getElementById('output'),
 	    permalink = document.getElementById('permalink'),
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -48,7 +48,7 @@
 		permalink.hash = encode(value);
 	};
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

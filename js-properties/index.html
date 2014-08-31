@@ -6,12 +6,12 @@
 <link rel=stylesheet href=eff.css>
 <meta name=description content="Wondering if you can use a given character sequence as an unquoted property name in JavaScript? This tool will tell you.">
 <h1>Unquoted JavaScript property name validator</h1>
-<p>Wondering if a given character sequence can be used as an unquoted property name in JavaScript? Can dot notation be used to get or set this property based on its name? <a href=http://mathiasbynens.be/notes/javascript-properties>Read all about it</a>, or just use this tool.
+<p>Wondering if a given character sequence can be used as an unquoted property name in JavaScript? Can dot notation be used to get or set this property based on its name? <a href=https://mathiasbynens.be/notes/javascript-properties>Read all about it</a>, or just use this tool.
 <noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
 <p><label>Enter a property name: <input value=foo-bar required autofocus placeholder="e.g. foo-bar"></label>
 <p>You <em>don’t need</em> to quote this property name<span id=es3> for backwards compatibility with ES3</span>: <a href=# id=permalink>permalink</a>
 <pre><code>var object = {<br>  <mark>foo-bar</mark>: 42<br>};</code></pre>
 <p id=dot>You can’t use dot notation here:
 <pre><code>object<mark>.foo-bar</mark> = 42;</code></pre>
-<p id=footer>Made by <a href=http://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/js-properties>fork this on GitHub!</a></p>
+<p id=footer>Made by <a href=https://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/js-properties>fork this on GitHub!</a></p>
 <script src=eff.js></script>

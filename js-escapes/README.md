@@ -1,5 +1,5 @@
-# [Mothereffing JavaScript escapes](http://mothereff.in/js-escapes)
+# [JavaScript escapes](https://mothereff.in/js-escapes)
 
-See <http://mathiasbynens.be/notes/javascript-escapes> for the full explanation.
+See <https://mathiasbynens.be/notes/javascript-escapes> for the full explanation.
 
-Made by [Mathias Bynens](http://mathiasbynens.be/).
+Made by [Mathias Bynens](https://mathiasbynens.be/).

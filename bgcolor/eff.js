@@ -4,7 +4,7 @@
 	var result = document.getElementById('result');
 	var example = document.getElementById('example');
 	var permalink = document.getElementById('permalink');
-	// http://mathiasbynens.be/notes/localstorage-pattern
+	// https://mathiasbynens.be/notes/localstorage-pattern
 	var storage = (function() {
 		var uid = new Date;
 		var storage;
@@ -40,7 +40,7 @@
 		storage && (storage.bgColor = value);
 	}
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	input.onkeyup = update;
 	input.oninput = function() {
 		input.onkeyup = null;

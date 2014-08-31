@@ -5,7 +5,7 @@
 	    bytes = document.getElementById('bytes'),
 	    permalink = document.getElementById('permalink'),
 	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -18,7 +18,7 @@
 	    	} catch(e) {}
 	    }());
 
-	// Taken from http://mths.be/punycode
+	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
 		var output = [],
 		    counter = 0,
@@ -67,7 +67,7 @@
 		storage && (storage.byteCountText = value);
 	};
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	textarea.onkeyup = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;

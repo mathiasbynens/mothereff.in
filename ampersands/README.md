@@ -1,5 +1,5 @@
-# [Mothereffing ambiguous ampersands](http://mothereff.in/ampersands)
+# [Ambiguous ampersands](https://mothereff.in/ampersands)
 
-See <http://mathiasbynens.be/notes/ambiguous-ampersands> for the full explanation.
+See <https://mathiasbynens.be/notes/ambiguous-ampersands> for the full explanation.
 
-Made by [Mathias Bynens](http://mathiasbynens.be/).
+Made by [Mathias Bynens](https://mathiasbynens.be/).

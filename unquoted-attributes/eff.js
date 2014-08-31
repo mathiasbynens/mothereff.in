@@ -28,7 +28,7 @@
 	    showHide = function(el, bool) {
 	    	el.style.display = bool ? 'none' : 'inline';
 	    },
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -69,7 +69,7 @@
 		storage && (storage.unquotedAttributes = value);
 	}
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	input.onkeydown = update;
 	input.oninput = function() {
 		this.onkeydown = null;
@@ -97,7 +97,7 @@
 
 }(this, document));
 
-// Optimized Google Analytics snippet: http://mths.be/aab */
+// Optimized Google Analytics snippet: https://mths.be/aab */
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
 	var g = d.createElement(t),

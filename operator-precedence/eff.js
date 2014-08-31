@@ -4,7 +4,7 @@
 	    b = document.getElementById('b'),
 	    permalink = document.getElementById('permalink'),
 	    output = document.getElementById('output'),
-	    // http://mathiasbynens.be/notes/localstorage-pattern
+	    // https://mathiasbynens.be/notes/localstorage-pattern
 	    storage = (function() {
 	    	var uid = new Date,
 	    	    storage,
@@ -54,7 +54,7 @@
 		permalink.href = '#' + encode(textA + '@' + textB);
 	}
 
-	// http://mathiasbynens.be/notes/oninput
+	// https://mathiasbynens.be/notes/oninput
 	a.onkeyup = b.onkeyup = update;
 	a.oninput = b.oninput = function() {
 		a.onkeyup = b.onkeyup = null;
