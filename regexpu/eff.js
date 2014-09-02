@@ -3,7 +3,7 @@
 	var textareas = document.getElementsByTagName('textarea');
 	var es6 = textareas[0];
 	var es5 = textareas[1];
-	var regexpu = require('regexpu');
+	var regexpu = window.regexpu = require('regexpu');
 	var run = document.getElementById('run');
 	var permalink = document.getElementById('permalink');
 	// https://mathiasbynens.be/notes/localstorage-pattern
