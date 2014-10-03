@@ -38,7 +38,7 @@
 	}
 
 	/*
-		// Go to http://www.whatwg.org/specs/web-apps/current-work/multipage/named-character-references.html and run this in your console:
+		// Go to https://html.spec.whatwg.org/multipage/named-character-references.html and run this in your console:
 		var charRefs = {},
 		    noSemi = [];
 		[].forEach.call(document.querySelectorAll('td code'), function(element) {
@@ -51,7 +51,7 @@
 	regexNoSemi = /(&(?:iacute|Aacute|Uacute|plusmn|otilde|Otilde|Agrave|agrave|yacute|Yacute|oslash|Oslash|Atilde|atilde|brvbar|Ccedil|ccedil|ograve|curren|divide|Eacute|eacute|Ograve|oacute|Egrave|egrave|ugrave|frac12|frac14|frac34|Ugrave|Oacute|Iacute|ntilde|Ntilde|uacute|middot|Igrave|igrave|iquest|aacute|cedil|laquo|micro|iexcl|icirc|Icirc|Acirc|ucirc|ecirc|Ocirc|ocirc|Ecirc|Ucirc|aring|Aring|aelig|AElig|acute|pound|raquo|acirc|times|thorn|szlig|THORN|copy|Auml|ordf|ordm|uuml|macr|Uuml|auml|Ouml|ouml|para|nbsp|Euml|QUOT|quot|euml|yuml|cent|sect|COPY|sup1|sup2|sup3|Iuml|iuml|eth|shy|REG|not|yen|AMP|amp|reg|uml|ETH|deg|GT|gt|lt|LT))[^;]?/g;
 
 	/*
-		// Go to http://www.whatwg.org/specs/web-apps/current-work/multipage/named-character-references.html and run this in your console:
+		// Go to https://html.spec.whatwg.org/multipage/named-character-references.html and run this in your console:
 		var charRefs = [],
 		    noSemi = [],
 		    charRefsThatHaveASemiFreeCharRefAsSubstring;
@@ -77,7 +77,7 @@
 	regexCharacterReferencesThatHaveASemicolonFreeCharacterReferenceAsSubstring = /&(?:Aacute|aacute|Acirc|acirc|acute|AElig|aelig|Agrave|agrave|AMP|amp|Aring|aring|Atilde|atilde|Auml|auml|brvbar|Ccedil|ccedil|cedil|cent|centerdot|COPY|copy|copysr|curren|deg|divide|divideontimes|Eacute|eacute|Ecirc|ecirc|Egrave|egrave|ETH|eth|Euml|euml|frac12|frac14|frac34|GT|gt|gtcc|gtcir|gtdot|gtlPar|gtquest|gtrapprox|gtrarr|gtrdot|gtreqless|gtreqqless|gtrless|gtrsim|Iacute|iacute|Icirc|icirc|iexcl|Igrave|igrave|iquest|Iuml|iuml|laquo|LT|lt|ltcc|ltcir|ltdot|lthree|ltimes|ltlarr|ltquest|ltri|ltrie|ltrif|ltrPar|macr|micro|middot|nbsp|not|notin|notindot|notinE|notinva|notinvb|notinvc|notni|notniva|notnivb|notnivc|Ntilde|ntilde|Oacute|oacute|Ocirc|ocirc|Ograve|ograve|ordf|ordm|Oslash|oslash|Otilde|otilde|Ouml|ouml|para|parallel|plusmn|pound|QUOT|quot|raquo|REG|reg|sect|shy|sup1|sup2|sup3|szlig|THORN|thorn|times|timesb|timesbar|timesd|Uacute|uacute|Ucirc|ucirc|Ugrave|ugrave|uml|Uuml|uuml|Yacute|yacute|yen|yuml);/g;
 
 	/*
-		// Go to http://www.whatwg.org/specs/web-apps/current-work/multipage/named-character-references.html and run this in your console:
+		// Go to https://html.spec.whatwg.org/multipage/named-character-references.html and run this in your console:
 		var charRefs = {},
 		    noSemi = [];
 		[].forEach.call(document.querySelectorAll('td code'), function(element) {

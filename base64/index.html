@@ -7,7 +7,7 @@
 <meta name=description content="An on-the-fly Base64 encoder/decoder.">
 <h1>Base64 encoder/decoder</h1>
 <noscript><strong>To use this tool, please <a href=http://enable-javascript.com/>enable JavaScript</a> and reload the page.</strong></noscript>
-<p>Did you know that <a href=http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#atob>the global <code>btoa</code> and <code>atob</code> methods in browsers</a> only support extended ASCII characters? For example, <code>btoa('foo ♥ bar')</code> throws an error. A proper Base64 encoder encodes strings as UTF-8 first, and then encodes the resulting byte sequence as Base64. When decoding, Base64 decoding is performed first, followed by UTF-8 decoding.
+<p>Did you know that <a href=https://html.spec.whatwg.org/multipage/webappapis.html#atob>the global <code>btoa</code> and <code>atob</code> methods in browsers</a> only support extended ASCII characters? For example, <code>btoa('foo ♥ bar')</code> throws an error. A proper Base64 encoder encodes strings as UTF-8 first, and then encodes the resulting byte sequence as Base64. When decoding, Base64 decoding is performed first, followed by UTF-8 decoding.
 <h2>Unicode (<a href=#foo%20%E2%99%A5%20bar id=permalink>permalink</a>)</h2>
 <textarea autofocus>foo ♥ bar</textarea>
 <h2>base64</h2>
