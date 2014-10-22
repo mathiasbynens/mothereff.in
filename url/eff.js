@@ -25,7 +25,7 @@
 	}
 
 	function decode(string) {
-		return decodeURIComponent(string);
+		return decodeURIComponent(string.replace(/\+/g, ' '));
 	}
 
 	function update() {
