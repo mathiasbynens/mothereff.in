@@ -82,7 +82,7 @@
 			character = string.charAt(counter++);
 			charCode = character.charCodeAt();
 			// if it’s a non-ASCII character and those need to be escaped
-			if (escapeNonASCII && (charCode < 32 || charCode > 126)) {
+			if (escapeNonASCII && (charCode < 0x20 || charCode > 0x7E)) {
 				if ((charCode & 0xF800) == 0xD800) {
 					surrogatePairCount++;
 					extraCharCode = string.charCodeAt(counter++);
@@ -93,8 +93,8 @@
 				}
 				value = '\\' + charCode.toString(16).toUpperCase() + ' ';
 			} else {
-				// \r is already tokenized away at this point
-				// `:` can be escaped as `\:`, but that fails in IE < 8
+				// `\r` is already tokenized away at this point by the HTML parser.
+				// `:` can be escaped as `\:`, but that fails in IE < 8.
 				if (/[\t\n\v\f:]/.test(character)) {
 					value = '\\' + charCode.toString(16).toUpperCase() + ' ';
 				} else if (/[ !"#$%&'()*+,./;<=>?@\[\\\]^`{|}~]/.test(character)) {
@@ -106,10 +106,10 @@
 			output += value;
 		}
 
-		if (/^_/.test(output)) { // Prevent IE6 from ignoring the rule altogether
+		if (/^_/.test(output)) { // Prevent IE6 from ignoring the rule altogether.
 			output = '\\_' + output.slice(1);
 		}
-		if (/^-[-\d]/.test(output)) {
+		if (/^-[\d]/.test(output)) {
 			output = '\\-' + output.slice(1);
 		}
 		if (/\d/.test(firstChar)) {
