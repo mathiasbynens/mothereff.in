@@ -33,13 +33,13 @@
 	}
 
 	function update() {
-		var element,
-		    value,
-		    result;
+		var element;
+		var value;
+		var result;
 		if (this == decoded) {
 			element = encoded;
 			value = text(decoded);
-			result = toASCII(value);
+			result = toASCII(value.toLowerCase());
 			text(element, result);
 			permalink.href = '#' + encode(value);
 		} else {
