@@ -22,7 +22,7 @@
 	    regexIdentifier = RegExp('^[' + identifierStart + '][' + identifierStart + identifierPartExclusive + ']*$'),
 	    // According to Unicode 3.0
 	    regexIdentifierUnicode3 = RegExp('^[' + identifierStartUnicode3 + '][' + identifierStartUnicode3 + identifierPartExclusiveUnicode3 + ']*$'),
-	    regexES51ReservedWord = /^(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$/,
+	    regexES51ReservedWord = /^(?:self|top|location|window|do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$/,
 	    // ES3 reserved words that aren’t ES5.1 reserved words
 	    regexES3ReservedWordExclusive = /^(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)$/,
 	    // Immutable properties of the global object
