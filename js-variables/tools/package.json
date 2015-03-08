@@ -1,0 +1,9 @@
+{
+	"private": true,
+	"dependencies": {
+		"lodash.template": "^3.3.0",
+		"regenerate": "^1.2.1",
+		"unicode-5.1.0": "^0.1.5",
+		"unicode-7.0.0": "^0.1.5"
+	}
+}

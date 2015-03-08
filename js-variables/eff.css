@@ -41,11 +41,11 @@ i {
 	padding-bottom: 0;
 }
 
-#es3, #unicode-3, #browser, #escaped-reserved-word, #immutable-properties, #zero-width {
+#es3, #es5, #unicode, #browser, #reserved-word, #immutable-properties, #zero-width {
 	display: none;
 }
 
-#es3.show, #unicode-3.show, #browser.show, #escaped-reserved-word.show, #immutable-properties.show, #zero-width.show {
+#es3.show, #es5.show, #unicode.show, #browser.show, #reserved-word.show, #immutable-properties.show, #zero-width.show {
 	display: block;
 }
 
