@@ -61,11 +61,11 @@ mark {
 	background: pink;
 }
 
-#es3 {
+#es3, #es5 {
 	display: none;
 }
 
-#es3.show {
+#es3.show, #es5.show {
 	display: inline;
 }
 
