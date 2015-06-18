@@ -5,7 +5,7 @@ var regenerate = require('regenerate');
 var template = require('lodash.template');
 
 // Which Unicode version should be used?
-var version = '7.0.0';
+var version = '8.0.0';
 
 // Set up a shorthand function to import Unicode data.
 var get = function(what) {
