@@ -5,8 +5,9 @@
 	var textarea = document.getElementsByTagName('textarea')[0];
 	var inputs = document.getElementsByTagName('input');
 	var checkboxOnlyASCII = inputs[0];
-	var checkboxES6 = inputs[1];
-	var checkboxStringBody = inputs[2];
+	var checkboxUseShorthand = inputs[1];
+	var checkboxES6 = inputs[2];
+	var checkboxStringBody = inputs[3];
 	var permalink = document.getElementById('permalink');
 	// https://mathiasbynens.be/notes/localstorage-pattern
 	var storage = (function() {
@@ -74,6 +75,7 @@
 				'quotes': 'single',
 				'wrap': true,
 				'escapeEverything': !checkboxOnlyASCII.checked,
+				'json' : checkboxUseShorthand.checked,
 				'es6': checkboxES6.checked
 			});
 			text(
@@ -91,6 +93,11 @@
 			} else {
 				storage.removeItem('jsEscapeOnlyASCII');
 			}
+			if (!checkboxUseShorthand.checked) {
+				storage.jsEscapeNotShorthand = true;
+			} else {
+				storage.removeItem('jsEscapeNotShorthand');
+			}
 			if (checkboxStringBody.checked) {
 				storage.jsEscapeStringBody = true;
 			} else {
@@ -101,7 +108,7 @@
 	}
 
 	// https://mathiasbynens.be/notes/oninput
-	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxES6.onchange = checkboxStringBody.onchange = update;
+	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxUseShorthand.onchange = checkboxES6.onchange = checkboxStringBody.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();
@@ -118,6 +125,7 @@
 	if (storage) {
 		storage.jsEscapeText && (textarea.value = storage.jsEscapeText);
 		storage.jsEscapeOnlyASCII && (checkboxOnlyASCII.checked = true);
+		storage.jsEscapeNotShorthand && (checkboxUseShorthand.checked = false);
 		storage.jsEscapeStringBody && (checkboxStringBody.checked = true);
 		update();
 	}
