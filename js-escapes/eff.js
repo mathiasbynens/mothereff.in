@@ -5,8 +5,9 @@
 	var textarea = document.getElementsByTagName('textarea')[0];
 	var inputs = document.getElementsByTagName('input');
 	var checkboxOnlyASCII = inputs[0];
-	var checkboxES6 = inputs[1];
-	var checkboxStringBody = inputs[2];
+	var checkboxOutputJSON = inputs[1];
+	var checkboxES6 = inputs[2];
+	var checkboxStringBody = inputs[3];
 	var permalink = document.getElementById('permalink');
 	// https://mathiasbynens.be/notes/localstorage-pattern
 	var storage = (function() {
@@ -71,10 +72,11 @@
 				result = value;
 			}
 			result = jsesc(result, {
-				'quotes': 'single',
+				'quotes': checkboxOutputJSON.checked ? 'double' : 'single',
 				'wrap': true,
 				'escapeEverything': !checkboxOnlyASCII.checked,
-				'es6': checkboxES6.checked
+				'json' : checkboxOutputJSON.checked,
+				'es6': checkboxES6.checked && !checkboxOutputJSON.checked
 			});
 			text(
 				code,
@@ -91,17 +93,23 @@
 			} else {
 				storage.removeItem('jsEscapeOnlyASCII');
 			}
+			if (checkboxOutputJSON.checked) {
+				storage.jsEscapeOutputJSON = true;
+			} else {
+				storage.removeItem('jsEscapeOutputJSON');
+			}
 			if (checkboxStringBody.checked) {
 				storage.jsEscapeStringBody = true;
 			} else {
 				storage.removeItem('jsEscapeStringBody');
 			}
 		}
+		checkboxES6.disabled = checkboxOutputJSON.checked;
 		permalink.hash = +checkboxOnlyASCII.checked + encode(textarea.value);
 	}
 
 	// https://mathiasbynens.be/notes/oninput
-	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxES6.onchange = checkboxStringBody.onchange = update;
+	textarea.onkeyup = checkboxOnlyASCII.onchange = checkboxOutputJSON.onchange = checkboxES6.onchange = checkboxStringBody.onchange = update;
 	textarea.oninput = function() {
 		textarea.onkeyup = null;
 		update();
@@ -118,6 +126,7 @@
 	if (storage) {
 		storage.jsEscapeText && (textarea.value = storage.jsEscapeText);
 		storage.jsEscapeOnlyASCII && (checkboxOnlyASCII.checked = true);
+		storage.jsEscapeOutputJSON && (checkboxOutputJSON.checked = true);
 		storage.jsEscapeStringBody && (checkboxStringBody.checked = true);
 		update();
 	}
