@@ -19,7 +19,7 @@ var ID_Continue = get('properties/ID_Continue');
 var compileRegex = template('/^(?:<%= identifierStart %>)(?:<%= identifierPart %>)*$/');
 
 var generateES6Regex = function() {
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-identifier-names-static-semantics-early-errors
+	// https://mths.be/es6#sec-identifier-names-static-semantics-early-errors
 	// http://unicode.org/reports/tr31/#Default_Identifier_Syntax
 	// https://bugs.ecmascript.org/show_bug.cgi?id=2717#c0
 	var identifierStart = regenerate(ID_Start)
