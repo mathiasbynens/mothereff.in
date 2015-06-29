@@ -1,4 +1,4 @@
-/*! https://mths.be/jsesc v0.4.3 by @mathias */
+/*! https://mths.be/jsesc v0.5.0 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -8,7 +8,7 @@
 	var freeModule = typeof module == 'object' && module &&
 		module.exports == freeExports && module;
 
-	// Detect free variable `global`, from Node.js or Browserified code,
+	// Detect free variable `global`, from Node.js/io.js or Browserified code,
 	// and use it as `root`
 	var freeGlobal = typeof global == 'object' && global;
 	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
@@ -51,12 +51,19 @@
 		return toString.call(value) == '[object Array]';
 	};
 	var isObject = function(value) {
-		// simple, but good enough for what we need
+		// This is a very simple check, but it’s good enough for what we need.
 		return toString.call(value) == '[object Object]';
 	};
 	var isString = function(value) {
 		return typeof value == 'string' ||
 			toString.call(value) == '[object String]';
+	};
+	var isFunction = function(value) {
+		// In a perfect world, the `typeof` check would be sufficient. However,
+		// in Chrome 1–12, `typeof /x/ == 'object'`, and in IE 6–8
+		// `typeof alert == 'object'` and similar for other host objects.
+		return typeof value == 'function' ||
+			toString.call(value) == '[object Function]';
 	};
 
 	/*--------------------------------------------------------------------------*/
@@ -71,13 +78,13 @@
 		'\n': '\\n',
 		'\r': '\\r',
 		'\t': '\\t'
-		// `\v` is omitted intentionally, because in IE < 9, '\v' == 'v'
+		// `\v` is omitted intentionally, because in IE < 9, '\v' == 'v'.
 		// '\v': '\\x0B'
 	};
 	var regexSingleEscape = /["'\\\b\f\n\r\t]/;
 
 	var regexDigit = /[0-9]/;
-	var regexWhitelist = /[\x20\x21\x23-\x26\x28-\x5B\x5D-\x7E]/;
+	var regexWhitelist = /[ !#-&\(-\[\]-~]/;
 
 	var jsesc = function(argument, options) {
 		// Handle options
@@ -107,6 +114,10 @@
 		var newLine = compact ? '' : '\n';
 		var result;
 		var isEmpty = true;
+
+		if (json && argument && isFunction(argument.toJSON)) {
+			argument = argument.toJSON();
+		}
 
 		if (!isString(argument)) {
 			if (isArray(argument)) {
@@ -227,7 +238,7 @@
 		return result;
 	};
 
-	jsesc.version = '0.4.3';
+	jsesc.version = '0.5.0';
 
 	/*--------------------------------------------------------------------------*/
 
@@ -242,7 +253,7 @@
 			return jsesc;
 		});
 	}	else if (freeExports && !freeExports.nodeType) {
-		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+		if (freeModule) { // in Node.js, io.js, or RingoJS v0.8.0+
 			freeModule.exports = jsesc;
 		} else { // in Narwhal or RingoJS v0.7.0-
 			freeExports.jsesc = jsesc;

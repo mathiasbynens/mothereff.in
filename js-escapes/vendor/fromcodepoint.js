@@ -1,9 +1,19 @@
-/*! https://mths.be/fromcodepoint v0.1.0 by @mathias */
+/*! https://mths.be/fromcodepoint v0.2.1 by @mathias */
 if (!String.fromCodePoint) {
 	(function() {
+		var defineProperty = (function() {
+			// IE 8 only supports `Object.defineProperty` on DOM elements
+			try {
+				var object = {};
+				var $defineProperty = Object.defineProperty;
+				var result = $defineProperty(object, object, object) && $defineProperty;
+			} catch(error) {}
+			return result;
+		}());
 		var stringFromCharCode = String.fromCharCode;
 		var floor = Math.floor;
-		var fromCodePoint = function() {
+		var fromCodePoint = function(_) {
+			var MAX_SIZE = 0x4000;
 			var codeUnits = [];
 			var highSurrogate;
 			var lowSurrogate;
@@ -12,6 +22,7 @@ if (!String.fromCodePoint) {
 			if (!length) {
 				return '';
 			}
+			var result = '';
 			while (++index < length) {
 				var codePoint = Number(arguments[index]);
 				if (
@@ -31,11 +42,15 @@ if (!String.fromCodePoint) {
 					lowSurrogate = (codePoint % 0x400) + 0xDC00;
 					codeUnits.push(highSurrogate, lowSurrogate);
 				}
+				if (index + 1 == length || codeUnits.length > MAX_SIZE) {
+					result += stringFromCharCode.apply(null, codeUnits);
+					codeUnits.length = 0;
+				}
 			}
-			return stringFromCharCode.apply(null, codeUnits);
+			return result;
 		};
-		if (Object.defineProperty) {
-			Object.defineProperty(String, 'fromCodePoint', {
+		if (defineProperty) {
+			defineProperty(String, 'fromCodePoint', {
 				'value': fromCodePoint,
 				'configurable': true,
 				'writable': true
