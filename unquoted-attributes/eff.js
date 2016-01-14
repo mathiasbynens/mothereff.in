@@ -2,51 +2,51 @@
 
 	// Up for a challenge? Golf this down: https://gist.github.com/1020383
 	var isUnquotableHTML = function(value) {
-	    	return /^[^ \t\n\f\r"'`=<>]+$/.test(value);
-	    },
-	    isUnquotableCSS = function(value) {
-	    	if (!value) return;
-	    	// Escapes are valid, so replace them with a valid non-empty string
-	    	value = value.replace(/\\([0-9A-Fa-f]{1,6})[ \t\n\f\r]?/g, 'a').replace(/\\./g, 'a');
-	    	return !(
-	    		/[\u0000-\u002c\u002e\u002f\u003A-\u0040\u005B-\u005E\u0060\u007B-\u009f]/.test(value)
-	    		|| /^(?:-?\d|--)/.test(value)
-	    	);
-	    },
-	    getElems = function(tagName) {
-	    	var elems = document.getElementsByTagName(tagName);
-	    	return {
-	    		'html': elems[0],
-	    		'css': elems[1]
-	    	};
-	    },
-	    iElems = getElems('i'),
-	    preElems = getElems('pre'),
-	    markElems = getElems('mark'),
-	    input = document.getElementsByTagName('input')[0],
-	    permalink = document.getElementById('permalink'),
-	    showHide = function(el, bool) {
-	    	el.style.display = bool ? 'none' : 'inline';
-	    },
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    text = function(el, str) {
-	    	if (str == null) {
-	    		return el.innerText || el.textContent;
-	    	}
-	    	el.innerText != null && (el.innerText = str);
-	    	el.textContent != null && (el.textContent = str);
-	    };
+		return /^[^ \t\n\f\r"'`=<>]+$/.test(value);
+	};
+	var isUnquotableCSS = function(value) {
+		if (value == '' || value == '-') return;
+		// Escapes are valid, so replace them with a valid non-empty string
+		value = value.replace(/\\([0-9A-Fa-f]{1,6})[ \t\n\f\r]?/g, 'a').replace(/\\./g, 'a');
+		return !(
+			/[\u0000-\u002c\u002e\u002f\u003A-\u0040\u005B-\u005E\u0060\u007B-\u009f]/.test(value)
+			|| /^(?:-?\d|--)/.test(value)
+		);
+	};
+	var getElems = function(tagName) {
+		var elems = document.getElementsByTagName(tagName);
+		return {
+			'html': elems[0],
+			'css': elems[1]
+		};
+	};
+	var iElems = getElems('i');
+	var preElems = getElems('pre');
+	var markElems = getElems('mark');
+	var input = document.getElementsByTagName('input')[0];
+	var permalink = document.getElementById('permalink');
+	var showHide = function(el, bool) {
+		el.style.display = bool ? 'none' : 'inline';
+	};
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var text = function(el, str) {
+		if (str == null) {
+			return el.innerText || el.textContent;
+		}
+		el.innerText != null && (el.innerText = str);
+		el.textContent != null && (el.textContent = str);
+	};
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -56,9 +56,9 @@
 	}
 
 	function update() {
-		var value = input.value,
-		    html = isUnquotableHTML(value),
-		    css = isUnquotableCSS(value);
+		var value = input.value;
+		var html = isUnquotableHTML(value);
+		var css = isUnquotableCSS(value);
 		text(markElems.html, value);
 		text(markElems.css, value);
 		preElems.html.className = html ? 'valid' : 'invalid';
@@ -100,8 +100,8 @@
 // Optimized Google Analytics snippet: https://mths.be/aab */
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));
