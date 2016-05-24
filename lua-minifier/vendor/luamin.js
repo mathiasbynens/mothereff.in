@@ -1,4 +1,4 @@
-/*! https://mths.be/luamin v0.2.7 by @mathias */
+/*! https://mths.be/luamin v1.0.2 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -123,6 +123,11 @@
 	var identifierMap;
 	var identifiersInUse;
 	var generateIdentifier = function(originalName) {
+		// Preserve `self` in methods
+		if (originalName == 'self') {
+			return originalName;
+		}
+
 		if (hasOwnProperty.call(identifierMap, originalName)) {
 			return identifierMap[originalName];
 		}
@@ -199,6 +204,24 @@
 		return a + b;
 	};
 
+	var formatBase = function(base) {
+		var result = '';
+		var type = base.type;
+		var needsParens = base.inParens && (
+			type == 'BinaryExpression' ||
+			type == 'FunctionDeclaration' ||
+			type == 'TableConstructorExpression'
+		);
+		if (needsParens) {
+			result += '(';
+		}
+		result += formatExpression(base);
+		if (needsParens) {
+			result += ')';
+		}
+		return result;
+	};
+
 	var formatExpression = function(expression, options) {
 
 		options = extend({
@@ -208,6 +231,7 @@
 
 		var result = '';
 		var currentPrecedence;
+		var associativity;
 		var operator;
 
 		var expressionType = expression.type;
@@ -238,18 +262,44 @@
 			// the inner expression must be wrapped in parens.
 			operator = expression.operator;
 			currentPrecedence = PRECEDENCE[operator];
+			associativity = 'left';
 
 			result = formatExpression(expression.left, {
-				'precedence': currentPrecedence
+				'precedence': currentPrecedence,
+				'direction': 'left',
+				'parent': operator
 			});
 			result = joinStatements(result, operator);
-			result = joinStatements(result, formatExpression(expression.right));
+			result = joinStatements(result, formatExpression(expression.right, {
+				'precedence': currentPrecedence,
+				'direction': 'right',
+				'parent': operator
+			}));
 
 			if (operator == '^' || operator == '..') {
-				currentPrecedence--;
+				associativity = "right";
 			}
 
-			if (currentPrecedence < options.precedence) {
+			if (
+				currentPrecedence < options.precedence ||
+				(
+					currentPrecedence == options.precedence &&
+					associativity != options.direction &&
+					options.parent != '+' &&
+					!(options.parent == '*' && (operator == '/' || operator == '*'))
+				)
+			) {
+				// The most simple case here is that of
+				// protecting the parentheses on the RHS of
+				// `1 - (2 - 3)` but deleting them from `(1 - 2) - 3`.
+				// This is generally the right thing to do. The
+				// semantics of `+` are special however: `1 + (2 - 3)`
+				// == `1 + 2 - 3`. `-` and `+` are the only two operators
+				// who share their precedence level. `*` also can
+				// commute in such a way with `/`, but not with `%`
+				// (all three share a precedence). So we test for
+				// all of these conditions and avoid emitting
+				// parentheses in the cases where we don’t have to.
 				result = '(' + result + ')';
 			}
 
@@ -265,13 +315,26 @@
 				})
 			);
 
-			if (currentPrecedence < options.precedence) {
+			if (
+				currentPrecedence < options.precedence &&
+				// In principle, we should parenthesize the RHS of an
+				// expression like `3^-2`, because `^` has higher precedence
+				// than unary `-` according to the manual. But that is
+				// misleading on the RHS of `^`, since the parser will
+				// always try to find a unary operator regardless of
+				// precedence.
+				!(
+					(options.parent == '^') &&
+					options.direction == 'right'
+				)
+			) {
 				result = '(' + result + ')';
 			}
 
 		} else if (expressionType == 'CallExpression') {
 
-			result = formatExpression(expression.base) + '(';
+			result = formatBase(expression.base) + '(';
+
 			each(expression.arguments, function(argument, needsComma) {
 				result += formatExpression(argument);
 				if (needsComma) {
@@ -292,12 +355,12 @@
 
 		} else if (expressionType == 'IndexExpression') {
 
-			result = formatExpression(expression.base) + '[' +
+			result = formatBase(expression.base) + '[' +
 				formatExpression(expression.index) + ']';
 
 		} else if (expressionType == 'MemberExpression') {
 
-			result = formatExpression(expression.base) + expression.indexer +
+			result = formatBase(expression.base) + expression.indexer +
 				formatExpression(expression.identifier, {
 					'preserveIdentifiers': true
 				});
@@ -331,8 +394,10 @@
 				} else if (field.type == 'TableValue') {
 					result += formatExpression(field.value);
 				} else { // at this point, `field.type == 'TableKeyString'`
-					result += formatExpression(field.key) + '=' +
-						formatExpression(field.value);
+					result += formatExpression(field.key, {
+						// TODO: keep track of nested scopes (#18)
+						'preserveIdentifiers': true
+					}) + '=' + formatExpression(field.value);
 				}
 				if (needsComma) {
 					result += ',';
@@ -577,7 +642,7 @@
 	/*--------------------------------------------------------------------------*/
 
 	var luamin = {
-		'version': '0.2.7',
+		'version': '1.0.2',
 		'minify': minify
 	};
 

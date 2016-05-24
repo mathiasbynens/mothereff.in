@@ -1,30 +1,42 @@
-/*global exports:true module:true require:true define:true global:true */
+/* global exports:true, module:true, require:true, define:true, global:true */
 
 (function (root, name, factory) {
+  /* jshint eqeqeq:false */
   'use strict';
 
-  var freeExports = typeof exports === 'object' && exports
-    // While CommonJS defines `module` as an object, component define it as a
-    // function
-    , freeModule = (typeof module === 'object' || typeof module === 'function') &&
-        module && module.exports === freeExports && module;
+  // Used to determine if values are of the language type `Object`
+  var objectTypes = {
+        'function': true
+      , 'object': true
+    }
+    // Detect free variable `exports`
+    , freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports
+    // Detect free variable `module`
+    , freeModule = objectTypes[typeof module] && module && !module.nodeType && module
+    // Detect free variable `global`, from Node.js or Browserified code, and
+    // use it as `window`
+    , freeGlobal = freeExports && freeModule && typeof global == 'object' && global
+    // Detect the popular CommonJS extension `module.exports`
+    , moduleExports = freeModule && freeModule.exports === freeExports && freeExports;
 
-  // Detect free variable `global`, from Node.js or Browserified code, and use
-  // it as `root`
-  var freeGlobal = typeof global === 'object' && global;
-  if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)
+  if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal || freeGlobal.self === freeGlobal)) {
     root = freeGlobal;
+  }
 
   // Some AMD build optimizers, like r.js, check for specific condition
   // patterns like the following:
-  if (typeof define === 'function' && define.amd) {
+  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+    // defined as an anonymous module.
     define(['exports'], factory);
+    // In case the source has been processed and wrapped in a define module use
+    // the supplied `exports` object.
+    if (freeExports && moduleExports) factory(freeModule.exports);
   }
   // check for `exports` after `define` in case a build optimizer adds an
   // `exports` object
-  else if (freeExports && !freeExports.nodeType) {
+  else if (freeExports && freeModule) {
     // in Node.js or RingoJS v0.8.0+
-    if (freeModule) factory(freeModule.exports);
+    if (moduleExports) factory(freeModule.exports);
     // in Narwhal or RingoJS v0.7.0-
     else factory(freeExports);
   }
@@ -35,7 +47,7 @@
 }(this, 'luaparse', function (exports) {
   'use strict';
 
-  exports.version = '0.1.3';
+  exports.version = '0.2.1';
 
   var input, options, length;
 
@@ -55,6 +67,13 @@
     // Store the start and end character locations on each syntax node as
     // `range: [start, end]`.
     , ranges: false
+    // A callback which will be invoked when a syntax node has been completed.
+    // The node which has been created will be passed as the only parameter.
+    , onCreateNode: null
+    // A callback which will be invoked when a new scope is created.
+    , onCreateScope: null
+    // A callback which will be invoked when the current scope is destroyed.
+    , onDestroyScope: null
   };
 
   // The available tokens expressed as enum flags so they can be checked with
@@ -74,11 +93,12 @@
   // will be different in some situations.
 
   var errors = exports.errors = {
-      unexpected: 'Unexpected %1 \'%2\' near \'%3\''
+      unexpected: 'unexpected %1 \'%2\' near \'%3\''
     , expected: '\'%1\' expected near \'%2\''
     , expectedToken: '%1 expected near \'%2\''
     , unfinishedString: 'unfinished string near \'%1\''
     , malformedNumber: 'malformed number near \'%1\''
+    , invalidVar: 'invalid left-hand side of assignment near \'%1\''
   };
 
   // ### Abstract Syntax Tree
@@ -352,9 +372,9 @@
       if (options.locations) node.loc = location.loc;
       if (options.ranges) node.range = location.range;
     }
+    if (options.onCreateNode) options.onCreateNode(node);
     return node;
   }
-
 
 
   // Helpers
@@ -572,15 +592,17 @@
 
       case 62: // >
         if (61 === next) return scanPunctuator('>=');
+        if (62 === next) return scanPunctuator('>>');
         return scanPunctuator('>');
 
       case 60: // <
+        if (60 === next) return scanPunctuator('<<');
         if (61 === next) return scanPunctuator('<=');
         return scanPunctuator('<');
 
       case 126: // ~
         if (61 === next) return scanPunctuator('~=');
-        return raise({}, errors.expected, '=', '~');
+        return scanPunctuator('~');
 
       case 58: // :
         if (58 === next) return scanPunctuator('::');
@@ -591,9 +613,14 @@
         if (91 === next || 61 === next) return scanLongStringLiteral();
         return scanPunctuator('[');
 
-      // \* / ^ % , { } ] ( ) ; # - +
-      case 42: case 47: case 94: case 37: case 44: case 123: case 125:
-      case 93: case 40: case 41: case 59: case 35: case 45: case 43:
+      case 47: // /
+        // Check for integer division op (//)
+        if (47 === next) return scanPunctuator('//');
+        return scanPunctuator('/');
+
+      // * ^ % , { } ] ( ) ; & # - + |
+      case 42: case 94: case 37: case 44: case 123: case 124: case 125:
+      case 93: case 40: case 41: case 59: case 38: case 35: case 45: case 43:
         return scanPunctuator(input.charAt(index));
     }
 
@@ -601,18 +628,31 @@
   }
 
   // Whitespace has no semantic meaning in lua so simply skip ahead while
-  // tracking the encounted newlines. Newlines are also tracked in all
-  // token functions where multiline values are allowed.
+  // tracking the encounted newlines. Any kind of eol sequence is counted as a
+  // single line.
+
+  function consumeEOL() {
+    var charCode = input.charCodeAt(index)
+      , peekCharCode = input.charCodeAt(index + 1);
+
+    if (isLineTerminator(charCode)) {
+      // Count \n\r and \r\n as one newline.
+      if (10 === charCode && 13 === peekCharCode) index++;
+      if (13 === charCode && 10 === peekCharCode) index++;
+      line++;
+      lineStart = ++index;
+
+      return true;
+    }
+    return false;
+  }
 
   function skipWhiteSpace() {
     while (index < length) {
       var charCode = input.charCodeAt(index);
       if (isWhiteSpace(charCode)) {
         index++;
-      } else if (isLineTerminator(charCode)) {
-        line++;
-        lineStart = ++index;
-      } else {
+      } else if (!consumeEOL()) {
         break;
       }
     }
@@ -925,6 +965,7 @@
       if (options.ranges) {
         node.range = [tokenStart, index];
       }
+      if (options.onCreateNode) options.onCreateNode(node);
       comments.push(node);
     }
   }
@@ -948,21 +989,15 @@
     index += level + 1;
 
     // If the first character is a newline, ignore it and begin on next line.
-    if (isLineTerminator(input.charCodeAt(index))) {
-      line++;
-      lineStart = index++;
-    }
+    if (isLineTerminator(input.charCodeAt(index))) consumeEOL();
 
     stringStart = index;
     while (index < length) {
-      character = input.charAt(index++);
+      // To keep track of line numbers run the `consumeEOL()` which increments
+      // its counter.
+      if (isLineTerminator(input.charCodeAt(index))) consumeEOL();
 
-      // We have to keep track of newlines as `skipWhiteSpace()` does not get
-      // to scan this part.
-      if (isLineTerminator(character.charCodeAt(0))) {
-        line++;
-        lineStart = index;
-      }
+      character = input.charAt(index++);
 
       // Once the delimiter is found, iterate through the depth count and see
       // if it matches.
@@ -1066,7 +1101,7 @@
   }
 
   function isUnary(token) {
-    if (Punctuator === token.type) return '#-'.indexOf(token.value) >= 0;
+    if (Punctuator === token.type) return '#-~'.indexOf(token.value) >= 0;
     if (Keyword === token.type) return 'not' === token.value;
     return false;
   }
@@ -1109,13 +1144,16 @@
 
   // Create a new scope inheriting all declarations from the previous scope.
   function createScope() {
-    scopes.push(Array.apply(null, scopes[scopeDepth++]));
+    var scope = Array.apply(null, scopes[scopeDepth++]);
+    scopes.push(scope);
+    if (options.onCreateScope) options.onCreateScope();
   }
 
   // Exit and remove the current scope.
-  function exitScope() {
-    scopes.pop();
+  function destroyScope() {
+    var scope = scopes.pop();
     scopeDepth--;
+    if (options.onDestroyScope) options.onDestroyScope();
   }
 
   // Add identifier name to the current scope if it doesnt already exist.
@@ -1206,7 +1244,9 @@
   function parseChunk() {
     next();
     markLocation();
+    if (options.scope) createScope();
     var body = parseBlock();
+    if (options.scope) destroyScope();
     if (EOF !== token.type) unexpected(token);
     // If the body is empty no previousToken exists when finishNode runs.
     if (trackLocations && !body.length) previousToken = token;
@@ -1222,9 +1262,6 @@
     var block = []
       , statement;
 
-    // Each block creates a new scope.
-    if (options.scope) createScope();
-
     while (!isBlockFollow(token)) {
       // Return has to be the last statement in a block.
       if ('return' === token.value) {
@@ -1237,7 +1274,6 @@
       if (statement) block.push(statement);
     }
 
-    if (options.scope) exitScope();
     // Doesn't really need an ast node
     return block;
   }
@@ -1309,14 +1345,15 @@
     var name = token.value
       , label = parseIdentifier();
 
-    if (options.scope) label.isLabel = scopeHasName('::' + name + '::');
     return finishNode(ast.gotoStatement(label));
   }
 
   //     do ::= 'do' block 'end'
 
   function parseDoStatement() {
+    if (options.scope) createScope();
     var body = parseBlock();
+    if (options.scope) destroyScope();
     expect('end');
     return finishNode(ast.doStatement(body));
   }
@@ -1326,7 +1363,9 @@
   function parseWhileStatement() {
     var condition = parseExpectedExpression();
     expect('do');
+    if (options.scope) createScope();
     var body = parseBlock();
+    if (options.scope) destroyScope();
     expect('end');
     return finishNode(ast.whileStatement(condition, body));
   }
@@ -1334,9 +1373,11 @@
   //     repeat ::= 'repeat' block 'until' exp
 
   function parseRepeatStatement() {
+    if (options.scope) createScope();
     var body = parseBlock();
     expect('until');
     var condition = parseExpectedExpression();
+    if (options.scope) destroyScope();
     return finishNode(ast.repeatStatement(condition, body));
   }
 
@@ -1374,7 +1415,9 @@
     }
     condition = parseExpectedExpression();
     expect('then');
+    if (options.scope) createScope();
     body = parseBlock();
+    if (options.scope) destroyScope();
     clauses.push(finishNode(ast.ifClause(condition, body)));
 
     if (trackLocations) marker = createLocationMarker();
@@ -1382,7 +1425,9 @@
       pushLocation(marker);
       condition = parseExpectedExpression();
       expect('then');
+      if (options.scope) createScope();
       body = parseBlock();
+      if (options.scope) destroyScope();
       clauses.push(finishNode(ast.elseifClause(condition, body)));
       if (trackLocations) marker = createLocationMarker();
     }
@@ -1393,7 +1438,9 @@
         marker = new Marker(previousToken);
         locations.push(marker);
       }
+      if (options.scope) createScope();
       body = parseBlock();
+      if (options.scope) destroyScope();
       clauses.push(finishNode(ast.elseClause(body)));
     }
 
@@ -1413,7 +1460,11 @@
       , body;
 
     // The start-identifier is local.
-    if (options.scope) scopeIdentifier(variable);
+
+    if (options.scope) {
+      createScope();
+      scopeIdentifier(variable);
+    }
 
     // If the first expression is followed by a `=` punctuator, this is a
     // Numeric For Statement.
@@ -1429,6 +1480,7 @@
       expect('do');
       body = parseBlock();
       expect('end');
+      if (options.scope) destroyScope();
 
       return finishNode(ast.forNumericStatement(variable, start, end, step, body));
     }
@@ -1454,6 +1506,7 @@
       expect('do');
       body = parseBlock();
       expect('end');
+      if (options.scope) destroyScope();
 
       return finishNode(ast.forGenericStatement(variables, iterators, body));
     }
@@ -1467,7 +1520,7 @@
   // child.
   //
   //     local ::= 'local' 'function' Name funcdecl
-  //        | 'local' Name {',' Name} ['=' exp {',' exp}
+  //        | 'local' Name {',' Name} ['=' exp {',' exp}]
 
   function parseLocalStatement() {
     var name;
@@ -1502,7 +1555,11 @@
     }
     if (consume('function')) {
       name = parseIdentifier();
-      if (options.scope) scopeIdentifier(name);
+
+      if (options.scope) {
+        scopeIdentifier(name);
+        createScope();
+      }
 
       // MemberExpressions are not allowed in local function statements.
       return parseFunctionDeclaration(name, true);
@@ -1511,8 +1568,16 @@
     }
   }
 
+  function validateVar(node) {
+    // @TODO we need something not dependent on the exact AST used. see also isCallExpression()
+    if (node.inParens || (['Identifier', 'MemberExpression', 'IndexExpression'].indexOf(node.type) === -1)) {
+      raise(token, errors.invalidVar, token.value);
+    }
+  }
+
   //     assignment ::= varlist '=' explist
-  //     varlist ::= prefixexp {',' prefixexp}
+  //     var ::= Name | prefixexp '[' exp ']' | prefixexp '.' Name
+  //     varlist ::= var {',' var}
   //     explist ::= exp {',' exp}
   //
   //     call ::= callexp
@@ -1533,9 +1598,11 @@
         , init = []
         , exp;
 
+      validateVar(expression);
       while (consume(',')) {
         exp = parsePrefixExpression();
         if (null == exp) raiseUnexpectedToken('<expression>', token);
+        validateVar(exp);
         variables.push(exp);
       }
       expect('=');
@@ -1613,6 +1680,7 @@
 
     var body = parseBlock();
     expect('end');
+    if (options.scope) destroyScope();
 
     isLocal = isLocal || false;
     return finishNode(ast.functionStatement(name, parameters, isLocal, body));
@@ -1628,20 +1696,22 @@
     if (trackLocations) marker = createLocationMarker();
     base = parseIdentifier();
 
-    if (options.scope) attachScope(base, false);
+    if (options.scope) {
+      attachScope(base, scopeHasName(base.name));
+      createScope();
+    }
 
     while (consume('.')) {
       pushLocation(marker);
       name = parseIdentifier();
-      if (options.scope) attachScope(name, false);
       base = finishNode(ast.memberExpression(base, '.', name));
     }
 
     if (consume(':')) {
       pushLocation(marker);
       name = parseIdentifier();
-      if (options.scope) attachScope(name, false);
       base = finishNode(ast.memberExpression(base, ':', name));
+      if (options.scope) scopeIdentifierName('self');
     }
 
     return base;
@@ -1666,12 +1736,14 @@
         value = parseExpectedExpression();
         fields.push(finishNode(ast.tableKey(key, value)));
       } else if (Identifier === token.type) {
-        key = parseExpectedExpression();
-        if (consume('=')) {
+        if ('=' === lookahead.value) {
+          key = parseIdentifier();
+          next();
           value = parseExpectedExpression();
           fields.push(finishNode(ast.tableKeyString(key, value)));
         } else {
-          fields.push(finishNode(ast.tableValue(key)));
+          value = parseExpectedExpression();
+          fields.push(finishNode(ast.tableValue(value)));
         }
       } else {
         if (null == (value = parseExpression())) {
@@ -1684,7 +1756,7 @@
         next();
         continue;
       }
-      if ('}' === token.value) break;
+      break;
     }
     expect('}');
     return finishNode(ast.tableConstructorExpression(fields));
@@ -1733,15 +1805,22 @@
 
     if (1 === length) {
       switch (charCode) {
-        case 94: return 10; // ^
-        case 42: case 47: case 37: return 7; // * / %
-        case 43: case 45: return 6; // + -
+        case 94: return 12; // ^
+        case 42: case 47: case 37: return 10; // * / %
+        case 43: case 45: return 9; // + -
+        case 38: return 6; // &
+        case 126: return 5; // ~
+        case 124: return 4; // |
         case 60: case 62: return 3; // < >
       }
     } else if (2 === length) {
       switch (charCode) {
-        case 46: return 5; // ..
-        case 60: case 62: case 61: case 126: return 3; // <= >= == ~=
+        case 47: return 10; // //
+        case 46: return 8; // ..
+        case 60: case 62:
+            if('<<' === operator || '>>' === operator) return 7; // << >>
+            return 3; // <= >=
+        case 61: case 126: return 3; // == ~=
         case 111: return 1; // or
       }
     } else if (97 === charCode && 'and' === operator) return 2;
@@ -1768,7 +1847,7 @@
     if (isUnary(token)) {
       markLocation();
       next();
-      var argument = parseSubExpression(8);
+      var argument = parseSubExpression(10);
       if (argument == null) raiseUnexpectedToken('<expression>', token);
       expression = finishNode(ast.unaryExpression(operator, argument));
     }
@@ -1812,9 +1891,7 @@
   //     args ::= '(' [explist] ')' | tableconstructor | String
 
   function parsePrefixExpression() {
-    var base, name, marker
-      // Keep track of the scope, if a parent is local so are the children.
-      , isLocal;
+    var base, name, marker;
 
     if (trackLocations) marker = createLocationMarker();
 
@@ -1823,11 +1900,11 @@
       name = token.value;
       base = parseIdentifier();
       // Set the parent scope.
-      if (options.scope) attachScope(base, isLocal = scopeHasName(name));
+      if (options.scope) attachScope(base, scopeHasName(name));
     } else if (consume('(')) {
       base = parseExpectedExpression();
       expect(')');
-      if (options.scope) isLocal = base.isLocal;
+      base.inParens = true; // XXX: quick and dirty. needed for validateVar
     } else {
       return null;
     }
@@ -1848,15 +1925,12 @@
             pushLocation(marker);
             next();
             identifier = parseIdentifier();
-            // Inherit the scope
-            if (options.scope) attachScope(identifier, isLocal);
             base = finishNode(ast.memberExpression(base, '.', identifier));
             break;
           case ':':
             pushLocation(marker);
             next();
             identifier = parseIdentifier();
-            if (options.scope) attachScope(identifier, isLocal);
             base = finishNode(ast.memberExpression(base, ':', identifier));
             // Once a : is found, this has to be a CallExpression, otherwise
             // throw an error.
@@ -1933,6 +2007,7 @@
     } else if (Keyword === type && 'function' === value) {
       pushLocation(marker);
       next();
+      if (options.scope) createScope();
       return parseFunctionDeclaration(null);
     } else if (consume('{')) {
       pushLocation(marker);
@@ -1948,6 +2023,15 @@
   //   - `wait` Hold parsing until end() is called. Defaults to false
   //   - `comments` Store comments. Defaults to true.
   //   - `scope` Track identifier scope. Defaults to false.
+  //   - `locations` Store location information. Defaults to false.
+  //   - `ranges` Store the start and end character locations. Defaults to
+  //     false.
+  //   - `onCreateNode` Callback which will be invoked when a syntax node is
+  //     created.
+  //   - `onCreateScope` Callback which will be invoked when a new scope is
+  //     created.
+  //   - `onDestroyScope` Callback which will be invoked when the current scope
+  //     is destroyed.
   //
   // Example:
   //
@@ -1996,6 +2080,11 @@
 
   function end(_input) {
     if ('undefined' !== typeof _input) write(_input);
+
+    // Ignore shebangs.
+    if (input && input.substr(0, 2) === '#!') input = input.replace(/^.*/, function (line) {
+      return line.replace(/./g, ' ');
+    });
 
     length = input.length;
     trackLocations = options.locations || options.ranges;
