@@ -12,13 +12,17 @@
 var match = string.match(/foo(.)bar/u);
 console.log(match[1]);
 // → '&#x1D306;'</textarea>
-<h2>Transpiled to ES5: (<a href=#run-code id=run>run code</a>, <a href=#var%20string%20%3D%20%27foo%F0%9D%8C%86bar%27%3B%0Avar%20match%20%3D%20string.match%28%2Ffoo%28.%29bar%2Fu%29%3B%0Aconsole.log%28match%5B1%5D%29%3B%0A%2F%2F%20%E2%86%92%20%27%F0%9D%8C%86%27 id=permalink>permalink</a>)</h2>
+<div><label><input type=checkbox> enable Unicode property escapes (<code>\p{…}</code> and <code>\P{…}</code></label></div>
+<div class=hide><label><input type=checkbox disabled> use ES6 <code>u</code> flag in output</label></div>
+<h2>Transpiled to <span id=target-language>ES5</span>: (<a href=#run-code id=run>run code</a>, <a href="#input=var+string+%3D+%27foo%F0%9D%8C%86bar%27%3B%0Avar+match+%3D+string.match(/foo(.)bar/u)%3B%0Aconsole.log(match%5B1%5D)%3B%0A//+%E2%86%92+%27%F0%9D%8C%86%27" id=permalink>permalink</a>)</h2>
 <textarea readonly>var string = 'foo&#x1D306;bar';
 var match = string.match(/foo((?:[\0-\t\x0B\f\x0E-\u2027\u202A-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))bar/);
 console.log(match[1]);
 // → '&#x1D306;'</textarea>
 <h2>About this tool</h2>
 <p>This tool uses <a href=https://mths.be/regexpu><i>regexpu</i></a> to transpile <a href=https://mathiasbynens.be/notes/es6-unicode-regex>ES6 Unicode regular expressions (with a <code>u</code> flag)</a> to equivalent ES5.
+<p>The <a href="https://github.com/mathiasbynens/regexpu-core/blob/master/property-escapes.md">Unicode property escapes functionality</a> is <a href="https://github.com/mathiasbynens/es-regexp-unicode-property-escapes">based on a proposal</a> and may or may not reflect what eventually gets specified.
 <p id=footer>Made by <a href=https://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/regexpu>fork this on GitHub!</a></p>
-<script src=vendor/regexpu-bundle.min.js></script>
+<script src=vendor/regexpu-browser.js></script>
+<script src=vendor/url-search-params.js></script>
 <script src=eff.js></script>

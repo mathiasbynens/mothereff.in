@@ -67,6 +67,10 @@ code {
 	background: #ffb6c1;
 }
 
+.hide {
+	display: none;
+}
+
 @media (min-width: 42em) {
 
 	html {

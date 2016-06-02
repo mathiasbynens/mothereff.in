@@ -4,6 +4,11 @@
 	var es6 = textareas[0];
 	var es5 = textareas[1];
 	var regexpu = window.regexpu = require('regexpu');
+	var inputs = document.getElementsByTagName('input');
+	var checkboxUnicodePropertyEscapes = inputs[0];
+	var checkboxUseUnicodeFlag = inputs[1];
+	var targetLanguage = document.getElementById('target-language');
+	var divUseUnicodeFlag = document.getElementsByTagName('div')[1];
 	var run = document.getElementById('run');
 	var permalink = document.getElementById('permalink');
 	// https://mathiasbynens.be/notes/localstorage-pattern
@@ -27,11 +32,19 @@
 	}
 
 	function update() {
+		var showUnicodeFlagCheckbox = checkboxUnicodePropertyEscapes.checked;
+		checkboxUseUnicodeFlag.disabled = !showUnicodeFlagCheckbox;
+		var useES6 = showUnicodeFlagCheckbox && checkboxUseUnicodeFlag.checked;
+		targetLanguage.textContent = useES6 ? 'ES6' : 'ES5';
+		divUseUnicodeFlag.classList.toggle('hide', !showUnicodeFlagCheckbox);
 		var value = es6.value;
 		var transpiled;
 		var isError = false;
 		try {
-			transpiled = regexpu.transpileCode(value);
+			transpiled = regexpu.transpileCode(value, {
+				'unicodePropertyEscape': checkboxUnicodePropertyEscapes.checked,
+				'useUnicodeFlag': useES6
+			});
 		} catch (exception) {
 			isError = true;
 		}
@@ -42,7 +55,15 @@
 			es6.className = es5.className = '';
 			es5.value = transpiled;
 		}
-		permalink.hash = encode(value);
+		var params = new URLSearchParams();
+		params.set('input', value);
+		if (checkboxUnicodePropertyEscapes.checked) {
+			params.set('unicodePropertyEscape', '1');
+		}
+		if (showUnicodeFlagCheckbox && checkboxUseUnicodeFlag.checked) {
+			params.set('useUnicodeFlag', '1');
+		}
+		permalink.hash = params.toString();
 		storage && (storage.regexpu = value);
 	};
 
@@ -51,7 +72,7 @@
 		eval(es5.value);
 	};
 
-	es6.oninput = update;
+	es6.oninput = checkboxUnicodePropertyEscapes.onchange = checkboxUseUnicodeFlag.onchange =  update;
 
 	if (storage) {
 		storage.regexpu && (es6.value = storage.regexpu);
@@ -59,7 +80,14 @@
 	}
 
 	window.onhashchange = function() {
-		es6.value = decodeURIComponent(location.hash.slice(1));
+		var params = new URLSearchParams(location.hash.slice(1));
+		checkboxUnicodePropertyEscapes.checked = JSON.parse(
+			params.get('unicodePropertyEscape')
+		);
+		checkboxUseUnicodeFlag.checked = JSON.parse(
+			params.get('useUnicodeFlag')
+		);
+		es6.value = params.get('input');
 		update();
 	};
 
@@ -74,6 +102,6 @@ window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d) {
 	var g = d.createElement('script');
 	var s = d.scripts[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document));
