@@ -1,6 +1,7 @@
 'use strict';
-var ncname = require('ncname');
+var isPotentialCustomElementName = require('is-potential-custom-element-name');
 
+// https://html.spec.whatwg.org/multipage/scripting.html#valid-custom-element-name
 var reservedNames = [
 	'annotation-xml',
 	'color-profile',
@@ -17,8 +18,8 @@ function hasError(name) {
 		return 'Missing element name.';
 	}
 
-	if (name.toLowerCase() !== name) {
-		return 'Custom element names must be lowercase.';
+	if (/[A-Z]/.test(name)) {
+		return 'Custom element names must not contain uppercase ASCII characters.';
 	}
 
 	if (name.indexOf('-') === -1) {
@@ -33,15 +34,15 @@ function hasError(name) {
 		return 'Custom element names must not start with a hyphen.';
 	}
 
-	// http://www.w3.org/TR/custom-elements/#concepts
-	if (!ncname.test(name)) {
+	// https://html.spec.whatwg.org/multipage/scripting.html#prod-potentialcustomelementname
+	if (!isPotentialCustomElementName(name)) {
 		return 'Invalid element name.';
 	}
 
 	if (reservedNames.indexOf(name) !== -1) {
-		return 'The supplied element name is reserved and can\'t be used.\nSee: http://www.w3.org/TR/custom-elements/#concepts';
+		return 'The supplied element name is reserved and can\'t be used.\nSee: https://html.spec.whatwg.org/multipage/scripting.html#valid-custom-element-name';
 	}
-};
+}
 
 function hasWarning(name) {
 	if (/^polymer-/i.test(name)) {
