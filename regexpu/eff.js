@@ -5,10 +5,11 @@
 	var es5 = textareas[1];
 	var regexpu = window.regexpu = require('regexpu');
 	var inputs = document.getElementsByTagName('input');
-	var checkboxUnicodePropertyEscapes = inputs[0];
-	var checkboxUseUnicodeFlag = inputs[1];
+	var checkboxDotAllFlag = inputs[0];
+	var checkboxUnicodePropertyEscapes = inputs[1];
+	var checkboxUseUnicodeFlag = inputs[2];
 	var targetLanguage = document.getElementById('target-language');
-	var divUseUnicodeFlag = document.getElementsByTagName('div')[1];
+	var divUseUnicodeFlag = document.getElementsByTagName('div')[2];
 	var run = document.getElementById('run');
 	var permalink = document.getElementById('permalink');
 	// https://mathiasbynens.be/notes/localstorage-pattern
@@ -42,6 +43,7 @@
 		var isError = false;
 		try {
 			transpiled = regexpu.transpileCode(value, {
+				'dotAllFlag': checkboxDotAllFlag.checked,
 				'unicodePropertyEscape': checkboxUnicodePropertyEscapes.checked,
 				'useUnicodeFlag': useES6
 			});
@@ -57,6 +59,9 @@
 		}
 		var params = new URLSearchParams();
 		params.set('input', value);
+		if (checkboxDotAllFlag.checked) {
+			params.set('dotAllFlag', '1');
+		}
 		if (checkboxUnicodePropertyEscapes.checked) {
 			params.set('unicodePropertyEscape', '1');
 		}
@@ -72,7 +77,7 @@
 		eval(es5.value);
 	};
 
-	es6.oninput = checkboxUnicodePropertyEscapes.onchange = checkboxUseUnicodeFlag.onchange =  update;
+	es6.oninput = checkboxDotAllFlag.onchange = checkboxUnicodePropertyEscapes.onchange = checkboxUseUnicodeFlag.onchange =  update;
 
 	if (storage) {
 		storage.regexpu && (es6.value = storage.regexpu);
@@ -81,6 +86,9 @@
 
 	window.onhashchange = function() {
 		var params = new URLSearchParams(location.hash.slice(1));
+		checkboxDotAllFlag.checked = JSON.parse(
+			params.get('dotAllFlag')
+		);
 		checkboxUnicodePropertyEscapes.checked = JSON.parse(
 			params.get('unicodePropertyEscape')
 		);

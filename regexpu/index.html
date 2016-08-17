@@ -12,6 +12,7 @@
 var match = string.match(/foo(.)bar/u);
 console.log(match[1]);
 // → '&#x1D306;'</textarea>
+<div><label><input type=checkbox> enable <code>s</code> (<code>dotAll</code>) flag</label></div>
 <div><label><input type=checkbox> enable Unicode property escapes (<code>\p{…}</code> and <code>\P{…}</code></label></div>
 <div class=hide><label><input type=checkbox disabled> use ES6 <code>u</code> flag in output</label></div>
 <h2>Transpiled to <span id=target-language>ES5</span>: (<a href=#run-code id=run>run code</a>, <a href="#input=var+string+%3D+%27foo%F0%9D%8C%86bar%27%3B%0Avar+match+%3D+string.match(/foo(.)bar/u)%3B%0Aconsole.log(match%5B1%5D)%3B%0A//+%E2%86%92+%27%F0%9D%8C%86%27" id=permalink>permalink</a>)</h2>
@@ -21,7 +22,7 @@ console.log(match[1]);
 // → '&#x1D306;'</textarea>
 <h2>About this tool</h2>
 <p>This tool uses <a href=https://mths.be/regexpu><i>regexpu</i></a> to transpile <a href=https://mathiasbynens.be/notes/es6-unicode-regex>ES6 Unicode regular expressions (with a <code>u</code> flag)</a> to equivalent ES5.
-<p>The <a href="https://github.com/mathiasbynens/regexpu-core/blob/master/property-escapes.md">Unicode property escapes functionality</a> is <a href="https://github.com/mathiasbynens/es-regexp-unicode-property-escapes">based on a proposal</a> and may or may not reflect what eventually gets specified.
+<p>The <a href="https://github.com/mathiasbynens/regexpu-core/blob/master/property-escapes.md">Unicode property escapes functionality</a> is <a href="https://github.com/mathiasbynens/es-regexp-unicode-property-escapes">based on a proposal</a> and may or may not reflect what eventually gets specified. The same applies for <a href="https://github.com/mathiasbynens/es-regexp-dotall-flag">the <code>s</code> (<code>dotAll</code>) flag</a>.
 <p id=footer>Made by <a href=https://mathiasbynens.be/>@mathias</a> — <a href=https://github.com/mathiasbynens/mothereff.in/tree/master/regexpu>fork this on GitHub!</a></p>
 <script src=vendor/regexpu-browser.js></script>
 <script src=vendor/url-search-params.js></script>
