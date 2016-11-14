@@ -1,4 +1,4 @@
-/*! https://mths.be/q v0.1.1 by @mathias | MIT license */
+/*! https://mths.be/q v1.0.0 by @mathias | MIT license */
 ;(function(root) {
 
 	// Detect free variables `exports`.
@@ -17,24 +17,24 @@
 
 	/*--------------------------------------------------------------------------*/
 
-	// http://tools.ietf.org/html/rfc2047#section-4.2
+	// https://tools.ietf.org/html/rfc2047#section-4.2
 	var stringFromCharCode = String.fromCharCode;
 	var decode = function(input) {
 		return input
 			// Decode `_` into a space. This is character-encoding-independent;
-			// see http://tools.ietf.org/html/rfc2047#section-4.2, item 2.
+			// see https://tools.ietf.org/html/rfc2047#section-4.2, item 2.
 			.replace(/_/g, ' ')
 			// Decode escape sequences of the form `=XX` where `XX` is any
 			// combination of two hexidecimal digits. For optimal compatibility,
 			// lowercase hexadecimal digits are supported as well. See
-			// http://tools.ietf.org/html/rfc2045#section-6.7, note 1.
+			// https://tools.ietf.org/html/rfc2045#section-6.7, note 1.
 			.replace(/=([a-fA-F0-9]{2})/g, function($0, $1) {
 				var codePoint = parseInt($1, 16);
 				return stringFromCharCode(codePoint);
 			});
 	};
 
-	var regexUnsafeSymbols = /[\0-\x1F=\?_\x7F-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF]/g;
+	var regexUnsafeSymbols = /[\0-\x1F"-\),\.:-@\[-\^`\{-\uFFFF]/g;
 	var encode = function(string) {
 		// Note: this assumes the input is already encoded into octets (e.g. using
 		// UTF-8), and that the resulting octets are within the extended ASCII
@@ -60,7 +60,7 @@
 	var q = {
 		'encode': encode,
 		'decode': decode,
-		'version': '0.1.1'
+		'version': '1.0.0'
 	};
 
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
