@@ -1,29 +1,29 @@
 (function(window, document) {
 
-	var textarea = document.getElementsByTagName('textarea')[0],
-	    characters = document.getElementById('characters'),
-	    pre = document.getElementsByTagName('pre')[0],
-	    output = document.getElementById('output'),
-	    permalink = document.getElementById('permalink'),
-	    dds = document.getElementsByTagName('dd'),
-	    before = dds[0],
-	    after = dds[1],
-	    ratio = dds[2],
-	    regexNotBrainfuck = /[^\+\-<>\[\],\.]/g,
-	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    characterReferences;
+	var textarea = document.getElementsByTagName('textarea')[0];
+	var characters = document.getElementById('characters');
+	var pre = document.getElementsByTagName('pre')[0];
+	var output = document.getElementById('output');
+	var permalink = document.getElementById('permalink');
+	var dds = document.getElementsByTagName('dd');
+	var before = dds[0];
+	var after = dds[1];
+	var ratio = dds[2];
+	var regexNotBrainfuck = /[^\+\-<>\[\],\.]/g;
+	var regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g;
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var characterReferences;
 
 	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
@@ -115,8 +115,8 @@
 // Google Analytics
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

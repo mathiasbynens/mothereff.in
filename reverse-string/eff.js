@@ -1,23 +1,23 @@
 (function(window, document) {
 
-	var textarea = document.getElementsByTagName('textarea')[0],
-	    characters = document.getElementById('characters'),
-	    pre = document.getElementsByTagName('pre')[0],
-	    output = document.getElementById('output'),
-	    permalink = document.getElementById('permalink'),
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    characterReferences;
+	var textarea = document.getElementsByTagName('textarea')[0];
+	var characters = document.getElementById('characters');
+	var pre = document.getElementsByTagName('pre')[0];
+	var output = document.getElementById('output');
+	var permalink = document.getElementById('permalink');
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var characterReferences;
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -41,7 +41,7 @@
 			text(output, result || '[no output]');
 			pre.className = result ? '' : 'fail';
 			storage && (storage.reverse = value);
-		} catch(error) {
+		} catch (exception) {
 			pre.className = 'fail';
 			text(output, error);
 		}
@@ -76,6 +76,6 @@ window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
 	var g = d.createElement(t),
 	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

@@ -1,31 +1,31 @@
 (function(window, document) {
 
-	var pre = document.getElementsByTagName('pre')[0],
-	    code = document.getElementsByTagName('code')[0],
-	    textarea = document.getElementsByTagName('textarea')[0],
-	    checkboxes = document.getElementsByTagName('input'),
-	    serif = checkboxes[0],
-	    script = checkboxes[1],
-	    fraktur = checkboxes[2],
-	    italic = checkboxes[3],
-	    bold = checkboxes[4],
-	    permalink = document.getElementById('permalink'),
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    stringFromCharCode = String.fromCharCode,
-	    regexAlpha = /[a-zA-Z]/g,
-	    regexNum = /[0-9]/g,
-	    types;
+	var pre = document.getElementsByTagName('pre')[0];
+	var code = document.getElementsByTagName('code')[0];
+	var textarea = document.getElementsByTagName('textarea')[0];
+	var checkboxes = document.getElementsByTagName('input');
+	var serif = checkboxes[0];
+	var script = checkboxes[1];
+	var fraktur = checkboxes[2];
+	var italic = checkboxes[3];
+	var bold = checkboxes[4];
+	var permalink = document.getElementById('permalink');
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var stringFromCharCode = String.fromCharCode;
+	var regexAlpha = /[a-zA-Z]/g;
+	var regexNum = /[0-9]/g;
+	var types;
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -99,9 +99,9 @@
 	})
 
 	function update() {
-		var value = textarea.value,
-		    result = value,
-		    settings = [];
+		var value = textarea.value;
+		var result = value;
+		var settings = [];
 
 		if (fraktur.checked) {
 			serif.checked = script.checked = script.disabled = serif.disabled = italic.disabled = true;
@@ -160,8 +160,8 @@
 // Google Analytics
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

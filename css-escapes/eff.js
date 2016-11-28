@@ -32,15 +32,15 @@
 	};
 	// https://mathiasbynens.be/notes/localstorage-pattern
 	var storage = (function() {
-		var uid = new Date,
-		    storage,
-		    result;
+		var uid = new Date;
+		var storage;
+		var result;
 		try {
 			(storage = window.localStorage).setItem(uid, uid);
 			result = storage.getItem(uid) == uid;
 			storage.removeItem(uid);
 			return result && storage;
-		} catch(exception) {}
+		} catch (exception) {}
 	}());
 
 	function encode(string) {
@@ -68,15 +68,15 @@
 	// https://mathiasbynens.be/notes/css-escapes
 	function cssEscape(string, escapeNonASCII) {
 		// Based on `ucs2decode` from https://mths.be/punycode
-		var firstChar = string.charAt(0),
-		    output = '',
-		    counter = 0,
-		    length = string.length,
-		    value,
-		    character,
-		    charCode,
-		    surrogatePairCount = 0,
-		    extraCharCode; // low surrogate
+		var firstChar = string.charAt(0);
+		var output = '';
+		var counter = 0;
+		var length = string.length;
+		var value;
+		var character;
+		var charCode;
+		var surrogatePairCount = 0;
+		var extraCharCode; // low surrogate
 
 		while (counter < length) {
 			character = string.charAt(counter++);
@@ -206,8 +206,8 @@
 // Optimized Google Analytics snippet: https://mths.be/aab */
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

@@ -1,26 +1,26 @@
 (function(window, document) {
 
-	var textarea = document.getElementsByTagName('textarea')[0],
-	    characters = document.getElementById('characters'),
-	    output = document.getElementById('output'),
-	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
-	    regexAmpersand = /&/g,
-	    regexCharacterReference = /&([0-9a-zA-Z]+);/g,
-	    regexCharacterReferencesThatHaveASemicolonFreeCharacterReferenceAsSubstring,
-	    regexNoSemi,
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    characterReferences;
+	var textarea = document.getElementsByTagName('textarea')[0];
+	var characters = document.getElementById('characters');
+	var output = document.getElementById('output');
+	var regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g;
+	var regexAmpersand = /&/g;
+	var regexCharacterReference = /&([0-9a-zA-Z]+);/g;
+	var regexCharacterReferencesThatHaveASemicolonFreeCharacterReferenceAsSubstring;
+	var regexNoSemi;
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var characterReferences;
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -2271,8 +2271,8 @@
 // Google Analytics
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

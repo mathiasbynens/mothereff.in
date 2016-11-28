@@ -7,7 +7,7 @@ if (!String.fromCodePoint) {
 				var object = {};
 				var $defineProperty = Object.defineProperty;
 				var result = $defineProperty(object, object, object) && $defineProperty;
-			} catch(error) {}
+			} catch(exception) {}
 			return result;
 		}());
 		var stringFromCharCode = String.fromCharCode;
@@ -97,7 +97,7 @@ if (!String.fromCodePoint) {
 	    		result = storage.getItem(uid) == uid;
 	    		storage.removeItem(uid);
 	    		return result && storage;
-	    	} catch(e) {}
+	    	} catch(exception) {}
 	    }()),
 	    stringFromCharCode = String.fromCharCode;
 

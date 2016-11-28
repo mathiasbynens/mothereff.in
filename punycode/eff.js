@@ -1,21 +1,21 @@
 (function(window, document, toASCII, toUnicode) {
 
-	var decoded = document.getElementById('decoded'),
-	    encoded = document.getElementById('encoded'),
-	    permalink = document.getElementById('permalink'),
-	    invalid = document.getElementById('invalid'),
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }());
+	var decoded = document.getElementById('decoded');
+	var encoded = document.getElementById('encoded');
+	var permalink = document.getElementById('permalink');
+	var invalid = document.getElementById('invalid');
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -94,8 +94,8 @@
 // Google Analytics
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

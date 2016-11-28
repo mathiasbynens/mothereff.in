@@ -11,26 +11,27 @@
 	    ratio = dds[2],
 	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
 	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    characterReferences;
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var characterReferences;
 
 	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
-		var output = [],
-		    counter = 0,
-		    length = string.length,
-		    value,
-		    extra;
+		var output = [];
+		var counter = 0;
+		var length = string.length;
+		var value;
+		var extra;
 		while (counter < length) {
 			value = string.charCodeAt(counter++);
 			if ((value & 0xF800) == 0xD800) {
@@ -87,7 +88,7 @@
 			text(ratio, (originalByteCount ? ((originalByteCount - resultingByteCount) / originalByteCount * 100) : 0).toFixed(2) + '%');
 
 			storage && (storage.lua = value);
-		} catch(error) {
+		} catch (exception) {
 			pre.className = 'fail';
 			text(output, error);
 		}

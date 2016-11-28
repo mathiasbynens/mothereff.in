@@ -1,21 +1,21 @@
 (function(window, document) {
 
-	var a = document.getElementById('a'),
-	    b = document.getElementById('b'),
-	    permalink = document.getElementById('permalink'),
-	    output = document.getElementById('output'),
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }());
+	var a = document.getElementById('a');
+	var b = document.getElementById('b');
+	var permalink = document.getElementById('permalink');
+	var output = document.getElementById('output');
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -46,9 +46,9 @@
 	}
 
 	function update() {
-		var textA = text(a),
-		    textB = text(b),
-		    ok = parse(textA) == parse(textB);
+		var textA = text(a);
+		var textB = text(b);
+		var ok = parse(textA) == parse(textB);
 		output.className = ok ? 'pass' : 'fail';
 		output.innerHTML = ok ? 'Yep.' : 'Nope.';
 		permalink.href = '#' + encode(textA + '@' + textB);

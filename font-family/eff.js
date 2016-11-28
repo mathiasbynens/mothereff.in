@@ -1,49 +1,49 @@
 (function(window, document) {
 
-	var inputs = document.getElementsByTagName('input'),
-	    input = inputs[0],
-	    checkbox = inputs[1],
-	    em = document.getElementsByTagName('em')[0],
-	    preElems = document.getElementsByTagName('pre'),
-	    pre1 = preElems[0],
-	    pre2 = preElems[1],
-	    pre3 = preElems[1],
-	    markElems = document.getElementsByTagName('mark'),
-	    mark1 = markElems[0],
-	    mark2 = markElems[1],
-	    mark3 = markElems[2],
-	    permalink = document.getElementById('permalink'),
-	    supplements = document.getElementById('supplementary-characters'),
-	    keyword = document.getElementById('keyword'),
-	    unquoted = document.getElementById('unquoted'),
-	    string = document.getElementById('string'),
-	    regexKeyword = /(?:^|[\t\n\f\r\x20])(?:serif|cursive|fantasy|inherit|initial|default|monospace|sans-serif)(?:$|[\t\n\f\r\x20])/gi,
-	    // http://www.w3.org/TR/css3-syntax/#whitespace
-	    regexWhitespace = /[\t\n\f\r\x20]/g,
-	    // Match valid unescaped identifier characters (even though they may not be valid at the start of the identifier)
-	    regexIdentifierCharacter = /^[a-zA-Z\d\xa0-\uffff_-]+$/,
-	    // If this regex matches an “identifier”, it’s an invalid one:
-	    regexInvalidIdentifier = /^(-?\d|--)/,
-	    regexConsecutiveSpaces = /(\\(?:[a-fA-F0-9]{1,6}\x20|\x20))?(\x20{2,})/g,
-	    regexTrailingEscape = /\\[a-fA-F0-9]{0,6}\x20$/,
-	    regexTrailingSpace = /\x20$/,
-	    regexSingleQuote = /'/g,
-	    regexLineBreak = /\r\n?/g,
-	    regexSimpleEscapeCharacters = /[ !"#$%&'()*+,.\/;<=>?@\[\\\]^`{|}~]/,
-	    regexSpaceAtStart = /^\x20/,
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    stringFromCharCode = String.fromCharCode;
+	var inputs = document.getElementsByTagName('input');
+	var input = inputs[0];
+	var checkbox = inputs[1];
+	var em = document.getElementsByTagName('em')[0];
+	var preElems = document.getElementsByTagName('pre');
+	var pre1 = preElems[0];
+	var pre2 = preElems[1];
+	var pre3 = preElems[1];
+	var markElems = document.getElementsByTagName('mark');
+	var mark1 = markElems[0];
+	var mark2 = markElems[1];
+	var mark3 = markElems[2];
+	var permalink = document.getElementById('permalink');
+	var supplements = document.getElementById('supplementary-characters');
+	var keyword = document.getElementById('keyword');
+	var unquoted = document.getElementById('unquoted');
+	var string = document.getElementById('string');
+	var regexKeyword = /(?:^|[\t\n\f\r\x20])(?:serif|cursive|fantasy|inherit|initial|default|monospace|sans-serif)(?:$|[\t\n\f\r\x20])/gi;
+	// http://www.w3.org/TR/css3-syntax/#whitespace
+	var regexWhitespace = /[\t\n\f\r\x20]/g;
+	// Match valid unescaped identifier characters (even though they may not be valid at the start of the identifier)
+	var regexIdentifierCharacter = /^[a-zA-Z\d\xa0-\uffff_-]+$/;
+	// If this regex matches an “identifier”, it’s an invalid one:
+	var regexInvalidIdentifier = /^(-?\d|--)/;
+	var regexConsecutiveSpaces = /(\\(?:[a-fA-F0-9]{1,6}\x20|\x20))?(\x20{2,})/g;
+	var regexTrailingEscape = /\\[a-fA-F0-9]{0,6}\x20$/;
+	var regexTrailingSpace = /\x20$/;
+	var regexSingleQuote = /'/g;
+	var regexLineBreak = /\r\n?/g;
+	var regexSimpleEscapeCharacters = /[ !"#$%&'()*+,.\/;<=>?@\[\\\]^`{|}~]/;
+	var regexSpaceAtStart = /^\x20/;
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var stringFromCharCode = String.fromCharCode;
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -65,7 +65,7 @@
 		while (length--) {
 			if (callback(array[length]) === false) {
 				break;
-			};
+			}
 		}
 	}
 
@@ -84,16 +84,16 @@
 	// https://mathiasbynens.be/notes/css-escapes
 	function cssEscape(string, escapeForString) {
 		// Based on `ucs2decode` from https://mths.be/punycode
-		var firstChar = string.charAt(0),
-		    output = '',
-		    counter = 0,
-		    length = string.length,
-		    value,
-		    character,
-		    charCode,
-		    surrogatePairCount = 0,
-		    extraCharCode, // low surrogate
-		    escapeNonASCII = checkbox.checked;
+		var firstChar = string.charAt(0);
+		var output = '';
+		var counter = 0;
+		var length = string.length;
+		var value;
+		var character;
+		var charCode;
+		var surrogatePairCount = 0;
+		var extraCharCode, // low surrogate
+		var escapeNonASCII = checkbox.checked;
 
 		while (counter < length) {
 			character = string.charAt(counter++);
@@ -139,15 +139,15 @@
 	}
 
 	function escapeIdentifierSequence(string, escapeForString) {
-		var isValid = true,
-		    identifiers = string.split(regexWhitespace),
-		    index = 0,
-		    length = identifiers.length,
-		    result = [],
-		    string,
-		    unescapedString,
-		    escapeResult,
-		    surrogatePairCount = 0;
+		var isValid = true;
+		var identifiers = string.split(regexWhitespace);
+		var index = 0;
+		var length = identifiers.length;
+		var result = [];
+		var string;
+		var unescapedString;
+		var escapeResult;
+		var surrogatePairCount = 0;
 		while (index < length) {
 			string = identifiers[index++];
 			if (string == '') {
@@ -191,9 +191,9 @@
 		}
 
 		result = result.replace(regexConsecutiveSpaces, function($0, $1, $2) {
-			var spaceCount,
-			    escapesNeeded,
-			    array;
+			var spaceCount;
+			var escapesNeeded;
+			var array;
 			spaceCount = $2.length;
 			escapesNeeded = Math.floor(spaceCount / 2);
 			array = makeArray('\\ ', escapesNeeded);
@@ -218,12 +218,12 @@
 
 	function update() {
 		// \r\n and \r become \n in the tokenizer as per HTML5
-		var value = input.value.replace(regexLineBreak, '\n'),
-		    isKeyword = (regexKeyword.lastIndex = 0, regexKeyword.test(value)),
-		    escaped,
-		    escapedOutput,
-		    needsEscaping,
-		    escapedString;
+		var value = input.value.replace(regexLineBreak, '\n');
+		var isKeyword = (regexKeyword.lastIndex = 0, regexKeyword.test(value));
+		var escaped;
+		var escapedOutput;
+		var needsEscaping;
+		var escapedString;
 
 		if (isKeyword) {
 			text(mark3, quote(value));
@@ -273,8 +273,8 @@
 // Optimized Google Analytics snippet: https://mths.be/aab */
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

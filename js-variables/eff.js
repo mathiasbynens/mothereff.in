@@ -7,7 +7,7 @@ if (!String.fromCodePoint) {
 				var object = {};
 				var $defineProperty = Object.defineProperty;
 				var result = $defineProperty(object, object, object) && $defineProperty;
-			} catch(error) {}
+			} catch (exception) {}
 			return result;
 		}());
 		var stringFromCharCode = String.fromCharCode;

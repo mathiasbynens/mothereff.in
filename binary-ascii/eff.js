@@ -1,26 +1,26 @@
 (function(window, document) {
 
-	var textareas = document.getElementsByTagName('textarea'),
-	    ascii = textareas[0],
-	    binary = textareas[1],
-	    permalink = document.getElementById('permalink'),
-	    regexBinaryGroup = /\s*[01]{8}\s*/g,
-	    regexAnyCharacter = /[\s\S]/g,
-	    regexBinary = /^(\s*[01]{8}\s*)*$/,
-	    regexExtendedASCII = /^[\x00-\xff]*$/,
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }()),
-	    stringFromCharCode = String.fromCharCode;
+	var textareas = document.getElementsByTagName('textarea');
+	var ascii = textareas[0];
+	var binary = textareas[1];
+	var permalink = document.getElementById('permalink');
+	var regexBinaryGroup = /\s*[01]{8}\s*/g;
+	var regexAnyCharacter = /[\s\S]/g;
+	var regexBinary = /^(\s*[01]{8}\s*)*$/;
+	var regexExtendedASCII = /^[\x00-\xff]*$/;
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+	var stringFromCharCode = String.fromCharCode;
 
 	function encode(string) {
 		// URL-encode some more characters to avoid issues when using permalink URLs in Markdown
@@ -94,8 +94,8 @@
 // Google Analytics
 window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
-	var g = d.createElement(t),
-	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	var g = d.createElement(t);
+	var s = d.getElementsByTagName(t)[0];
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

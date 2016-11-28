@@ -1,22 +1,22 @@
 (function(window, document) {
 
-	var textarea = document.getElementsByTagName('textarea')[0],
-	    characters = document.getElementById('characters'),
-	    bytes = document.getElementById('bytes'),
-	    permalink = document.getElementById('permalink'),
-	    regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g,
-	    // https://mathiasbynens.be/notes/localstorage-pattern
-	    storage = (function() {
-	    	var uid = new Date,
-	    	    storage,
-	    	    result;
-	    	try {
-	    		(storage = window.localStorage).setItem(uid, uid);
-	    		result = storage.getItem(uid) == uid;
-	    		storage.removeItem(uid);
-	    		return result && storage;
-	    	} catch(e) {}
-	    }());
+	var textarea = document.getElementsByTagName('textarea')[0];
+	var characters = document.getElementById('characters');
+	var bytes = document.getElementById('bytes');
+	var permalink = document.getElementById('permalink');
+	var regexNumberGroup = /(?=(?:\d{3})+$)(?!\b)/g;
+	// https://mathiasbynens.be/notes/localstorage-pattern
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
 
 	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
@@ -95,6 +95,6 @@ window._gaq = [['_setAccount', 'UA-6065217-60'], ['_trackPageview']];
 (function(d, t) {
 	var g = d.createElement(t),
 	    s = d.getElementsByTagName(t)[0];
-	g.src = '//www.google-analytics.com/ga.js';
+	g.src = 'https://www.google-analytics.com/ga.js';
 	s.parentNode.insertBefore(g, s);
 }(document, 'script'));

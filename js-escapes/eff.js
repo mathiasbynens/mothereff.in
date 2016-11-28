@@ -19,7 +19,7 @@
 			result = storage.getItem(uid) == uid;
 			storage.removeItem(uid);
 			return result && storage;
-		} catch(exception) {}
+		} catch (exception) {}
 	}());
 	var cache = {
 		'\n': '\\n',
