@@ -9,8 +9,8 @@
 		// Escapes are valid, so replace them with a valid non-empty string
 		value = value.replace(/\\([0-9A-Fa-f]{1,6})[ \t\n\f\r]?/g, 'a').replace(/\\./g, 'a');
 		return !(
-			/[\u0000-\u002c\u002e\u002f\u003A-\u0040\u005B-\u005E\u0060\u007B-\u009f]/.test(value)
-			|| /^(?:-?\d|--)/.test(value)
+			/[\0-\x2C\x2E\x2F\x3A-\x40\x5B-\x5E\x60\x7B-\x9F]/.test(value)
+			|| /^-?\d/.test(value)
 		);
 	};
 	var getElems = function(tagName) {
