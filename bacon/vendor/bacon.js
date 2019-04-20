@@ -20,18 +20,49 @@
 	var DEFAULT_ALPHABET = 'ABCDEFGHIKLMNOPQRSTUWXYZ';
 
 	var decode = function(ciphertext, options) {
-		ciphertext = ciphertext.toUpperCase();
-		// Use the most common 24-letter Bacon alphabet by default.
+		// the baconcode is hidden in the ciphertext (eg uppercase = 'A' and lowercase = 'B')
 		var alphabet = options && options.alphabet != null ?
 			options.alphabet.toUpperCase() :
 			DEFAULT_ALPHABET;
-		var index = -1;
+		var index = 0;
 		var length = ciphertext.length;
+		var symbol;
+		var alphabetIndex;
+		symbol = ciphertext.charAt(0);
+		// x is for aB and X for Ab
+		if (symbol == 'x'){
+			while (++index < length) {
+				alphabetIndex = alphabet.indexOf(ciphertext.charAt(index).toUpperCase());
+				if (alphabetIndex > -1) {
+					symbol = ciphertext.charAt(index);
+					if (symbol == symbol.toUpperCase()){
+						ciphertext = ciphertext.substring(0, index) + 'B' + ciphertext.substring(index + 1);
+					} else {
+						ciphertext = ciphertext.substring(0, index) + 'A' + ciphertext.substring(index + 1);
+					}
+				}
+			}
+		}
+		else if (symbol == 'X'){
+			while (++index < length) {
+				alphabetIndex = alphabet.indexOf(ciphertext.charAt(index).toUpperCase());
+				if (alphabetIndex > -1) {
+					symbol = ciphertext.charAt(index);
+					if (symbol == symbol.toUpperCase()){
+						ciphertext = ciphertext.substring(0, index) + 'A' + ciphertext.substring(index + 1);
+					} else {
+						ciphertext = ciphertext.substring(0, index) + 'B' + ciphertext.substring(index + 1);
+					}
+				}
+			}
+		}
+		// continue normal decoding
+		ciphertext = ciphertext.toUpperCase();
+		// Use the most common 24-letter Bacon alphabet by default.
+		index = -1;
 		var space = '';
 		var result = '';
 		var buffer = [];
-		var symbol;
-		var alphabetIndex;
 		while (++index < length) {
 			symbol = ciphertext.charAt(index);
 			if (symbol == 'A' || symbol == 'B') {
